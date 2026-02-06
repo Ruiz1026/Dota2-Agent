@@ -1,0 +1,327 @@
+{
+  "hero_id  // 英雄ID": 1,
+  "result  // 结果数据": {
+    "gold_per_min  // 每分钟金钱(GPM)": [
+      {
+        "percentile  // 百分位": 0.1,
+        "value": 381
+      },
+      {
+        "percentile  // 百分位": 0.2,
+        "value": 460
+      },
+      {
+        "percentile  // 百分位": 0.3,
+        "value": 523
+      },
+      {
+        "percentile  // 百分位": 0.4,
+        "value": 579
+      },
+      {
+        "percentile  // 百分位": 0.5,
+        "value": 630
+      },
+      {
+        "percentile  // 百分位": 0.6,
+        "value": 672
+      },
+      {
+        "percentile  // 百分位": 0.7,
+        "value": 714
+      },
+      {
+        "percentile  // 百分位": 0.8,
+        "value": 760
+      },
+      {
+        "percentile  // 百分位": 0.9,
+        "value": 818
+      },
+      {
+        "percentile  // 百分位": 0.95,
+        "value": 857
+      },
+      {
+        "percentile  // 百分位": 0.99,
+        "value": 950
+      }
+    ],
+    "xp_per_min  // 每分钟经验(XPM)": [
+      {
+        "percentile  // 百分位": 0.1,
+        "value": 485
+      },
+      {
+        "percentile  // 百分位": 0.2,
+        "value": 617
+      },
+      {
+        "percentile  // 百分位": 0.3,
+        "value": 714
+      },
+      {
+        "percentile  // 百分位": 0.4,
+        "value": 809
+      },
+      {
+        "percentile  // 百分位": 0.5,
+        "value": 890
+      },
+      {
+        "percentile  // 百分位": 0.6,
+        "value": 971
+      },
+      {
+        "percentile  // 百分位": 0.7,
+        "value": 1054
+      },
+      {
+        "percentile  // 百分位": 0.8,
+        "value": 1139
+      },
+      {
+        "percentile  // 百分位": 0.9,
+        "value": 1247
+      },
+      {
+        "percentile  // 百分位": 0.95,
+        "value": 1316
+      },
+      {
+        "percentile  // 百分位": 0.99,
+        "value": 1474
+      }
+    ],
+    "kills_per_min": [
+      {
+        "percentile  // 百分位": 0.1,
+        "value": 0.06256517205422316
+      },
+      {
+        "percentile  // 百分位": 0.2,
+        "value": 0.10217113665389528
+      },
+      {
+        "percentile  // 百分位": 0.3,
+        "value": 0.1403180542563143
+      },
+      {
+        "percentile  // 百分位": 0.4,
+        "value": 0.1736613603473227
+      },
+      {
+        "percentile  // 百分位": 0.5,
+        "value": 0.20954598370197905
+      },
+      {
+        "percentile  // 百分位": 0.6,
+        "value": 0.245398773006135
+      },
+      {
+        "percentile  // 百分位": 0.7,
+        "value": 0.28314028314028317
+      },
+      {
+        "percentile  // 百分位": 0.8,
+        "value": 0.3339960238568589
+      },
+      {
+        "percentile  // 百分位": 0.9,
+        "value": 0.40955631399317405
+      },
+      {
+        "percentile  // 百分位": 0.95,
+        "value": 0.48780487804878053
+      },
+      {
+        "percentile  // 百分位": 0.99,
+        "value": 0.6484962406015037
+      }
+    ],
+    "last_hits_per_min": [
+      {
+        "percentile  // 百分位": 0.1,
+        "value": 4.660493827160494
+      },
+      {
+        "percentile  // 百分位": 0.2,
+        "value": 6.064981949458483
+      },
+      {
+        "percentile  // 百分位": 0.3,
+        "value": 7.055167055167056
+      },
+      {
+        "percentile  // 百分位": 0.4,
+        "value": 7.835051546391753
+      },
+      {
+        "percentile  // 百分位": 0.5,
+        "value": 8.487486398258978
+      },
+      {
+        "percentile  // 百分位": 0.6,
+        "value": 9.110807113543093
+      },
+      {
+        "percentile  // 百分位": 0.7,
+        "value": 9.753863766456783
+      },
+      {
+        "percentile  // 百分位": 0.8,
+        "value": 10.47715736040609
+      },
+      {
+        "percentile  // 百分位": 0.9,
+        "value": 11.412429378531073
+      },
+      {
+        "percentile  // 百分位": 0.95,
+        "value": 12.147937411095306
+      },
+      {
+        "percentile  // 百分位": 0.99,
+        "value": 13.76261127596439
+      }
+    ],
+    "hero_damage_per_min": [
+      {
+        "percentile  // 百分位": 0.1,
+        "value": 186.81290322580645
+      },
+      {
+        "percentile  // 百分位": 0.2,
+        "value": 269.2479753181643
+      },
+      {
+        "percentile  // 百分位": 0.3,
+        "value": 353.29120077783176
+      },
+      {
+        "percentile  // 百分位": 0.4,
+        "value": 432.9843363561418
+      },
+      {
+        "percentile  // 百分位": 0.5,
+        "value": 514.6120689655172
+      },
+      {
+        "percentile  // 百分位": 0.6,
+        "value": 599.4979079497908
+      },
+      {
+        "percentile  // 百分位": 0.7,
+        "value": 691.7241379310345
+      },
+      {
+        "percentile  // 百分位": 0.8,
+        "value": 812.2748815165877
+      },
+      {
+        "percentile  // 百分位": 0.9,
+        "value": 959.6423248882265
+      },
+      {
+        "percentile  // 百分位": 0.95,
+        "value": 1112.9025028016438
+      },
+      {
+        "percentile  // 百分位": 0.99,
+        "value": 1450.6398996235885
+      }
+    ],
+    "hero_healing_per_min": [
+      {
+        "percentile  // 百分位": 0.1,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.2,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.3,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.4,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.5,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.6,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.7,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.8,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.9,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.95,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.99,
+        "value": 7.618080243778567
+      }
+    ],
+    "tower_damage  // 建筑伤害": [
+      {
+        "percentile  // 百分位": 0.1,
+        "value": 0
+      },
+      {
+        "percentile  // 百分位": 0.2,
+        "value": 273
+      },
+      {
+        "percentile  // 百分位": 0.3,
+        "value": 986
+      },
+      {
+        "percentile  // 百分位": 0.4,
+        "value": 2627
+      },
+      {
+        "percentile  // 百分位": 0.5,
+        "value": 5078
+      },
+      {
+        "percentile  // 百分位": 0.6,
+        "value": 7959
+      },
+      {
+        "percentile  // 百分位": 0.7,
+        "value": 10739
+      },
+      {
+        "percentile  // 百分位": 0.8,
+        "value": 13514
+      },
+      {
+        "percentile  // 百分位": 0.9,
+        "value": 16905
+      },
+      {
+        "percentile  // 百分位": 0.95,
+        "value": 19751
+      },
+      {
+        "percentile  // 百分位": 0.99,
+        "value": 24310
+      }
+    ]
+  }
+}

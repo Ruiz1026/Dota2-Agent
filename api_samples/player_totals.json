@@ -1,0 +1,147 @@
+[
+  {
+    "field  // 统计字段名": "kills",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "deaths",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "assists",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "kda",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "gold_per_min",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "xp_per_min",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "last_hits",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "denies",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "lane_efficiency_pct",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "duration",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "level",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "hero_damage",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "tower_damage",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "hero_healing",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "stuns",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "tower_kills",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "neutral_kills",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "courier_kills",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "purchase_tpscroll",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "purchase_ward_observer",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "purchase_ward_sentry",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "purchase_gem",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "purchase_rapier",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "pings",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "throw",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "comeback",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "stomp",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "loss",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  },
+  {
+    "field  // 统计字段名": "actions_per_min",
+    "n  // 样本数量": 0,
+    "sum  // 总和": 0
+  }
+]

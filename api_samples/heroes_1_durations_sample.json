@@ -1,0 +1,27 @@
+[
+  {
+    "duration_bin": 5700,
+    "games_played": 2,
+    "wins": 0
+  },
+  {
+    "duration_bin": 3300,
+    "games_played": 301,
+    "wins": 157
+  },
+  {
+    "duration_bin": 7500,
+    "games_played": 1,
+    "wins": 0
+  },
+  {
+    "duration_bin": 1800,
+    "games_played": 2727,
+    "wins": 1357
+  },
+  {
+    "duration_bin": 3900,
+    "games_played": 55,
+    "wins": 29
+  }
+]

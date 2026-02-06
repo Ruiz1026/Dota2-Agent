@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dota2 ReAct Chat</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #0f0f0f;
+      color: #f5f5f5;
+      min-height: 100vh;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06), transparent 45%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.04), transparent 45%),
+        radial-gradient(circle at 30% 90%, rgba(255,255,255,0.05), transparent 40%);
+      pointer-events: none;
+      opacity: 0.55;
+      z-index: -1;
+    }
+    .layout {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      display: flex;
+      gap: 18px;
+      padding: 24px 24px 32px 12px;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .sidebar {
+      width: 260px;
+      flex: 0 0 260px;
+      min-width: 220px;
+      max-width: 320px;
+      background: #0c0c0c;
+      border: 1px solid #1f1f1f;
+      border-radius: 14px;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 48px);
+      position: sticky;
+      top: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      animation: fadeIn 0.5s ease;
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .sidebar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+    .sidebar-btn {
+      background: #f5f5f5;
+      color: #111;
+      border: none;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .sidebar-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+    .history {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      padding-right: 4px;
+      height: 100%;
+    }
+    .history-item {
+      border: 1px solid #1f1f1f;
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #131313;
+      color: #e6e6e6;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      width: 100%;
+    }
+    .history-item:hover {
+      transform: translateY(-1px);
+      border-color: #2a2a2a;
+      background: #171717;
+    }
+    .history-item.active {
+      border-color: #ffd700;
+      box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.4);
+    }
+    .history-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #f5f5f5;
+    }
+    .history-meta {
+      font-size: 11px;
+      color: #9a9a9a;
+    }
+    .app {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .chat-wrapper {
+      position: relative;
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+    header.app-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #f5f5f5;
+      animation: slideDown 0.35s ease;
+      font-family: "Segoe UI Variable Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    .app-header .logo {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+    }
+    .app-header .title {
+      text-transform: uppercase;
+    }
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 8px 0 16px;
+      overflow-y: auto;
+    }
+    .preset-panel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .preset-panel.hidden {
+      display: none;
+    }
+    .preset-panel-content {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .preset-heading {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f5f5f5;
+      text-align: center;
+      letter-spacing: 0.6px;
+    }
+    .preset-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(220px, 1fr));
+      gap: 12px;
+      justify-items: center;
+    }
+    .preset-card {
+      border: 1px solid #1f1f1f;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #131313;
+      color: #e6e6e6;
+      cursor: pointer;
+      width: 100%;
+      max-width: 320px;
+      text-align: left;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: presetIn 0.45s ease forwards;
+    }
+    .preset-card:nth-child(1) { animation-delay: 0.05s; }
+    .preset-card:nth-child(2) { animation-delay: 0.12s; }
+    .preset-card:nth-child(3) { animation-delay: 0.19s; }
+    .preset-card:nth-child(4) { animation-delay: 0.26s; }
+    .preset-card:hover {
+      transform: translateY(-1px);
+      border-color: #2a2a2a;
+      background: #171717;
+    }
+    .preset-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f5f5f5;
+      margin-bottom: 6px;
+    }
+    .preset-desc {
+      font-size: 12px;
+      color: #9a9a9a;
+      line-height: 1.5;
+    }
+    .message {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      max-width: 1160px;
+      animation: messageIn 0.3s ease;
+    }
+    .message.no-animate {
+      animation: none;
+    }
+    .message.no-animate .bubble {
+      transition: none;
+    }
+    .message.sending .bubble {
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .message.assistant {
+      align-self: flex-start;
+      width: 100%;
+      max-width: 100%;
+    }
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      line-height: 1.1;
+      font-weight: 600;
+      text-transform: uppercase;
+      border: 1px solid #2b2b2b;
+      background: #151515;
+      color: #f5f5f5;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .avatar.user {
+      background: #f5f5f5;
+      color: #111;
+    }
+    .bubble {
+      max-width: 980px;
+      line-height: 1.6;
+      padding: 12px 16px;
+      border-radius: 12px;
+      white-space: normal;
+      word-break: break-word;
+      border: 1px solid #1f1f1f;
+      background: #121212;
+      color: #f0f0f0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .bubble:hover {
+      transform: translateY(-1px);
+      border-color: #2a2a2a;
+    }
+    .message.assistant .bubble {
+      flex: 1;
+      max-width: none;
+    }
+    .message.user .bubble {
+      background: #1a1a1a;
+      color: #f8f8f8;
+      white-space: pre-wrap;
+    }
+    .bubble h1,
+    .bubble h2,
+    .bubble h3,
+    .bubble h4 {
+      margin: 10px 0 6px;
+      line-height: 1.3;
+      color: #f6f6f6;
+    }
+    .bubble p {
+      margin: 6px 0 10px;
+    }
+    .bubble ul,
+    .bubble ol {
+      margin: 6px 0 10px 18px;
+      padding: 0;
+    }
+    .bubble li {
+      margin: 4px 0;
+    }
+    .bubble code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+    .bubble pre {
+      background: #0f0f0f;
+      border: 1px solid #262626;
+      padding: 10px 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 8px 0 12px;
+    }
+    .bubble pre code {
+      background: transparent;
+      padding: 0;
+      font-size: 12px;
+    }
+    .bubble table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 12px;
+      font-size: 13px;
+    }
+    .bubble th,
+    .bubble td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 6px 8px;
+      text-align: left;
+    }
+    .bubble th {
+      color: #ffd700;
+      font-weight: 600;
+    }
+    .status {
+      font-size: 12px;
+      color: #9b9b9b;
+      border-left: 2px solid #2e2e2e;
+      padding-left: 10px;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+      display: none;
+    }
+    .status-text {
+      white-space: pre-wrap;
+    }
+    .status.visible {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    .typing {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #bdbdbd;
+      margin-bottom: 8px;
+      opacity: 0.9;
+    }
+    .typing.hidden {
+      display: none;
+    }
+    .thinking {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #9b9b9b;
+      margin-top: 6px;
+      opacity: 0.9;
+    }
+    .thinking.hidden {
+      display: none;
+    }
+    .typing .dot,
+    .thinking .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      animation: blink 1.2s infinite ease-in-out;
+    }
+    .typing .dot:nth-child(2),
+    .thinking .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .typing .dot:nth-child(3),
+    .thinking .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    .embed {
+      margin-top: 12px;
+    }
+    .embed iframe {
+      width: 100%;
+      height: 1280px;
+      border: 1px solid #2b2b2b;
+      border-radius: 10px;
+      background: #0f0f0f;
+    }
+    .composer {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      background: #111;
+      border: 1px solid #1f1f1f;
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.2s ease;
+    }
+    .composer:focus-within {
+      border-color: #2a2a2a;
+    }
+    textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #f5f5f5;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      min-height: 40px;
+      max-height: 160px;
+      font-family: inherit;
+    }
+    button {
+      background: #ffffff;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    button:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    button.loading {
+      position: relative;
+      color: transparent;
+    }
+    button.loading::after {
+      content: "";
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #111;
+      border-top-color: transparent;
+      transform: translate(-50%, -50%);
+      animation: spin 0.8s linear infinite;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+    }
+    @media (max-width: 980px) {
+      .layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+      }
+      .preset-grid {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.01); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.85; }
+    }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.2; }
+      40% { opacity: 1; }
+    }
+    @keyframes presetIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">会话历史</div>
+        <button class="sidebar-btn" id="newChatBtn">新对话</button>
+      </div>
+      <div class="history" id="historyList"></div>
+    </aside>
+    <div class="app">
+      <header class="app-header">
+        <img class="logo" src="/figure/Dota-2-Logo.png" alt="Dota 2 Logo" />
+        <span class="title">Dota2 Chat</span>
+      </header>
+      <div class="chat-wrapper">
+        <div class="preset-panel" id="presetPanel">
+          <div class="preset-panel-content">
+            <div class="preset-heading">想了解关于Dota2的什么内容？</div>
+            <div class="preset-grid">
+              <button class="preset-card" type="button" data-preset="介绍一下新英雄郎戈">
+                <div class="preset-title">介绍一下新英雄郎戈</div>
+                <div class="preset-desc">获取新英雄定位、技能与打法要点。</div>
+              </button>
+              <button class="preset-card" type="button" data-preset="分析team falcons战队最近比赛的视野情况">
+                <div class="preset-title">分析 Team Falcons 最近视野</div>
+                <div class="preset-desc">快速生成最近比赛的视野分析报告。</div>
+              </button>
+              <button class="preset-card" type="button" data-preset="falcons的选手们最近在玩什么英雄">
+                <div class="preset-title">Falcons 近期英雄偏好</div>
+                <div class="preset-desc">查看选手近况与常用英雄。</div>
+              </button>
+              <button class="preset-card" type="button" data-preset="给玩家355962940一些上分建议">
+                <div class="preset-title">玩家上分建议</div>
+                <div class="preset-desc">结合近期表现给出上分策略。</div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="chat" id="chat"></div>
+      </div>
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="Type your message..."></textarea>
+        <button id="sendBtn">Send</button>
+      </div>
+      <footer>Thought/Action/Observation stream during generation, then collapse to final.</footer>
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('sendBtn');
+    const historyList = document.getElementById('historyList');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const presetPanel = document.getElementById('presetPanel');
+    let activeHistoryItem = null;
+    let pendingNewSession = false;
+    let activeSessionId = null;
+    const sessionStore = new Map();
+    let currentStream = null;
+    let tempSessionCounter = 0;
+    let historyPollTimer = null;
+    let activeSessionSignature = null;
+    const MAX_STATUS_CHARS = 3000;
+    const MAX_OBSERVATION_CHARS = 800;
+    const STATUS_TYPER_SPEED = 6;
+    const FINAL_TYPER_SPEED = 10;
+    const HISTORY_POLL_INTERVAL = 5000;
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function renderInline(text) {
+      const escaped = escapeHtml(text);
+      return escaped
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    }
+
+    function truncateText(text, maxChars) {
+      if (!text) return '';
+      if (maxChars <= 0) return text;
+      if (text.length <= maxChars) return text;
+      return text.slice(0, maxChars) + '...';
+    }
+
+    function appendStatusBuffer(stream, line) {
+      if (!stream || !line) return;
+      const next = stream.statusBuffer + line;
+      stream.statusBuffer = next.length > MAX_STATUS_CHARS
+        ? next.slice(next.length - MAX_STATUS_CHARS)
+        : next;
+    }
+
+    function parseTable(lines, startIndex) {
+      const headerLine = lines[startIndex];
+      const separatorLine = lines[startIndex + 1];
+      if (separatorLine === undefined) return null;
+      if (!/^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/.test(separatorLine)) {
+        return null;
+      }
+
+      const readCells = (line) => {
+        const trimmed = line.trim();
+        const raw = trimmed.startsWith('|') ? trimmed.slice(1) : trimmed;
+        const rawTail = raw.endsWith('|') ? raw.slice(0, -1) : raw;
+        return rawTail.split('|').map((cell) => renderInline(cell.trim()));
+      };
+
+      const headerCells = readCells(headerLine);
+      let index = startIndex + 2;
+      const bodyRows = [];
+      while (index < lines.length) {
+        const line = lines[index];
+        if (!line.trim()) break;
+        if (!line.includes('|')) break;
+        bodyRows.push(readCells(line));
+        index += 1;
+      }
+
+      const headerHtml = `<tr>${headerCells.map((cell) => `<th>${cell}</th>`).join('')}</tr>`;
+      const bodyHtml = bodyRows
+        .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+        .join('');
+      const tableHtml = `<table><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
+
+      return { html: tableHtml, nextIndex: index };
+    }
+
+    const SECTION_HEADINGS = new Set([
+      '英雄简介',
+      '命石',
+      '核心技能',
+      '先天被动',
+      '魔晶升级',
+      'A杖升级',
+      '大招附带乐曲技能',
+    ]);
+
+    function hasPlainTableLine(line) {
+      if (!line) return false;
+      if (line.includes('|')) return false;
+      return /\t+|\s{2,}/.test(line.trim());
+    }
+
+    function parsePlainTable(lines, startIndex) {
+      const headerLine = lines[startIndex];
+      if (!hasPlainTableLine(headerLine)) return null;
+      const splitCells = (line) => line
+        .trim()
+        .split(/\t+|\s{2,}/)
+        .map((cell) => cell.trim())
+        .filter(Boolean);
+      const headerCells = splitCells(headerLine);
+      if (headerCells.length < 2) return null;
+      const bodyRows = [];
+      let index = startIndex + 1;
+      while (index < lines.length) {
+        const current = lines[index];
+        if (!current.trim()) break;
+        if (!hasPlainTableLine(current)) break;
+        const rowCells = splitCells(current);
+        if (rowCells.length < 2) break;
+        bodyRows.push(rowCells);
+        index += 1;
+      }
+      if (!bodyRows.length) return null;
+      const toRow = (cells) => `| ${cells.join(' | ')} |`;
+      const separator = `| ${headerCells.map(() => '---').join(' | ')} |`;
+      const tableLines = [toRow(headerCells), separator, ...bodyRows.map(toRow)];
+      return { lines: tableLines, nextIndex: index };
+    }
+
+    function normalizePlainTextToMarkdown(text) {
+      if (!text) return '';
+      const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const lines = normalized.split('\n');
+      const output = [];
+      let i = 0;
+      while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        if (!trimmed) {
+          output.push('');
+          i += 1;
+          continue;
+        }
+        if (trimmed.includes('视野分析报告')) {
+          output.push(`## ${trimmed}`);
+          i += 1;
+          continue;
+        }
+        if (/^[一二三四五六七八九十]+、/.test(trimmed)) {
+          const title = trimmed.replace(/^[一二三四五六七八九十]+、\s*/, '');
+          output.push(`### ${title}`);
+          i += 1;
+          continue;
+        }
+        if (/^新英雄[:：]/.test(trimmed)) {
+          output.push(`## ${trimmed}`);
+          i += 1;
+          continue;
+        }
+        if (SECTION_HEADINGS.has(trimmed)) {
+          const level = trimmed === '大招附带乐曲技能' ? '####' : '###';
+          output.push(`${level} ${trimmed}`);
+          i += 1;
+          continue;
+        }
+        if (/^参数[:：]?$/.test(trimmed)) {
+          output.push(`**参数：**`);
+          i += 1;
+          continue;
+        }
+        const tableBlock = parsePlainTable(lines, i);
+        if (tableBlock) {
+          output.push(...tableBlock.lines);
+          i = tableBlock.nextIndex;
+          continue;
+        }
+        output.push(line);
+        i += 1;
+      }
+      return output.join('\n');
+    }
+
+    function sanitizeCodeFences(text) {
+      if (!text) return '';
+      const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const lines = normalized.split('\n');
+      let open = false;
+      for (let idx = 0; idx < lines.length; idx += 1) {
+        if (lines[idx].startsWith('```')) {
+          open = !open;
+        }
+      }
+      if (open) {
+        for (let idx = lines.length - 1; idx >= 0; idx -= 1) {
+          if (lines[idx].startsWith('```')) {
+            lines.splice(idx, 1);
+            break;
+          }
+        }
+      }
+      return lines.join('\n');
+    }
+
+    function isMarkdownLike(content) {
+      if (!content) return false;
+      const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const lines = normalized.split('\n');
+      if (lines.some((line) => /^\s{0,3}#{1,6}\s+/.test(line))) {
+        return true;
+      }
+      if (lines.some((line) => /^\s*([-*]|\d+\.)\s+/.test(line))) {
+        return true;
+      }
+      if (lines.some((line) => SECTION_HEADINGS.has(line.trim()) || /^新英雄[:：]/.test(line.trim()))) {
+        return true;
+      }
+      for (let idx = 0; idx < lines.length - 1; idx += 1) {
+        if (hasPlainTableLine(lines[idx]) && hasPlainTableLine(lines[idx + 1])) {
+          return true;
+        }
+      }
+      for (let idx = 0; idx < lines.length - 1; idx += 1) {
+        const current = lines[idx];
+        const next = lines[idx + 1];
+        if (current.includes('|') && /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/.test(next)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function renderMarkdown(text) {
+      if (!text) return '';
+      const normalized = normalizePlainTextToMarkdown(sanitizeCodeFences(text));
+      const lines = normalized.split('\n');
+      const output = [];
+      let i = 0;
+
+      while (i < lines.length) {
+        const line = lines[i];
+        if (!line.trim()) {
+          i += 1;
+          continue;
+        }
+
+        if (line.startsWith('```')) {
+          const lang = line.slice(3).trim().toLowerCase();
+          const codeLines = [];
+          i += 1;
+          while (i < lines.length && !lines[i].startsWith('```')) {
+            codeLines.push(lines[i]);
+            i += 1;
+          }
+          const hasClosingFence = i < lines.length && lines[i].startsWith('```');
+          if (!hasClosingFence) {
+            const fallbackLines = [line, ...codeLines];
+            const fallbackText = fallbackLines.map((item) => renderInline(item)).join('<br>');
+            output.push(`<p>${fallbackText}</p>`);
+            continue;
+          }
+          i += 1;
+          const codeContent = codeLines.join('\n');
+          if (lang === 'markdown' || lang === 'md' || (!lang && isMarkdownLike(codeContent))) {
+            output.push(renderMarkdown(codeContent));
+          } else {
+            const safeLang = escapeHtml(lang);
+            const safeCode = escapeHtml(codeContent);
+            output.push(`<pre><code data-lang="${safeLang}">${safeCode}</code></pre>`);
+          }
+          continue;
+        }
+
+        const tableBlock = parseTable(lines, i);
+        if (tableBlock) {
+          output.push(tableBlock.html);
+          i = tableBlock.nextIndex;
+          continue;
+        }
+
+        const headingMatch = line.match(/^(#{1,4})\s+(.*)$/);
+        if (headingMatch) {
+          const level = headingMatch[1].length;
+          const content = renderInline(headingMatch[2].trim());
+          output.push(`<h${level}>${content}</h${level}>`);
+          i += 1;
+          continue;
+        }
+
+        const listMatch = line.match(/^(\d+\.|[-*])\s+(.*)$/);
+        if (listMatch) {
+          const isOrdered = /\d+\./.test(listMatch[1]);
+          const tag = isOrdered ? 'ol' : 'ul';
+          const items = [];
+          while (i < lines.length) {
+            const current = lines[i];
+            const currentMatch = current.match(/^(\d+\.|[-*])\s+(.*)$/);
+            if (!currentMatch) break;
+            items.push(`<li>${renderInline(currentMatch[2].trim())}</li>`);
+            i += 1;
+          }
+          output.push(`<${tag}>${items.join('')}</${tag}>`);
+          continue;
+        }
+
+        const paragraphLines = [];
+        while (i < lines.length && lines[i].trim()) {
+          paragraphLines.push(renderInline(lines[i].trim()));
+          i += 1;
+        }
+        output.push(`<p>${paragraphLines.join('<br>')}</p>`);
+      }
+
+      return output.join('');
+    }
+
+    function createMessage(role, extraClass = '', disableAnimation = false) {
+      const wrapper = document.createElement('div');
+      wrapper.className = `message ${role}${extraClass ? ` ${extraClass}` : ''}${disableAnimation ? ' no-animate' : ''}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = `avatar ${role}`;
+      avatar.textContent = role === 'assistant' ? 'Agent' : '用户';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(bubble);
+      chat.appendChild(wrapper);
+      chat.scrollTop = chat.scrollHeight;
+
+      return { wrapper, bubble };
+    }
+
+    function appendUserMessage(text, disableAnimation = false) {
+      const extraClass = disableAnimation ? '' : 'sending';
+      const { wrapper, bubble } = createMessage('user', extraClass, disableAnimation);
+      bubble.textContent = text;
+      return { wrapper, bubble };
+    }
+
+    function appendAssistantFinal(text, wardHtml, disableAnimation = false) {
+      const { bubble } = createMessage('assistant', '', disableAnimation);
+      const finalText = document.createElement('div');
+      bubble.appendChild(finalText);
+      finalText.innerHTML = renderMarkdown(text || '');
+      if (wardHtml) {
+        const embed = document.createElement('div');
+        embed.className = 'embed';
+        const iframe = document.createElement('iframe');
+        iframe.src = wardHtml;
+        iframe.loading = 'lazy';
+        embed.appendChild(iframe);
+        bubble.appendChild(embed);
+      }
+    }
+
+    function clearChat() {
+      chat.innerHTML = '';
+      if (presetPanel) {
+        presetPanel.classList.remove('hidden');
+      }
+    }
+
+    function setActiveHistoryItem(item) {
+      if (activeHistoryItem) {
+        activeHistoryItem.classList.remove('active');
+      }
+      activeHistoryItem = item;
+      if (activeHistoryItem) {
+        activeHistoryItem.classList.add('active');
+      }
+    }
+
+    function ensureSession(sessionId) {
+      if (!sessionStore.has(sessionId)) {
+        sessionStore.set(sessionId, {
+          sessionId,
+          conversations: [],
+        });
+      }
+      return sessionStore.get(sessionId);
+    }
+
+    function createTempSession(message) {
+      tempSessionCounter += 1;
+      const tempId = `temp-${Date.now()}-${tempSessionCounter}`;
+      const session = ensureSession(tempId);
+      const conversation = {
+        local_id: `local-${Date.now()}-${tempSessionCounter}`,
+        conversation_id: null,
+        timestamp: new Date().toISOString(),
+        user_input: message,
+        final_answer: '',
+        status: 'running',
+        ward_html: '',
+      };
+      session.conversations.push(conversation);
+      return { sessionId: tempId, conversation };
+    }
+
+    function getConversationSortValue(value) {
+      const num = Number(value);
+      return Number.isNaN(num) ? null : num;
+    }
+
+    function compareConversations(a, b) {
+      const aNum = getConversationSortValue(a.conversation_id);
+      const bNum = getConversationSortValue(b.conversation_id);
+      if (aNum !== null && bNum !== null) {
+        return aNum - bNum;
+      }
+      return (a.timestamp || '').localeCompare(b.timestamp || '');
+    }
+
+    function isSameConversation(a, b) {
+      if (!a || !b) return false;
+      if (a.conversation_id && b.conversation_id) {
+        return String(a.conversation_id) === String(b.conversation_id);
+      }
+      if (a.local_id && b.local_id) {
+        return a.local_id === b.local_id;
+      }
+      return false;
+    }
+
+    function mergeConversation(target, incoming) {
+      if (incoming.conversation_id) {
+        target.conversation_id = incoming.conversation_id;
+      }
+      if (incoming.timestamp) {
+        target.timestamp = incoming.timestamp;
+      }
+      if (incoming.user_input) {
+        target.user_input = incoming.user_input;
+      }
+      if (incoming.final_answer) {
+        target.final_answer = incoming.final_answer;
+      }
+      if (incoming.ward_html) {
+        target.ward_html = incoming.ward_html;
+      }
+      if (incoming.status && (target.status === 'running' || incoming.status !== 'running')) {
+        target.status = incoming.status;
+      }
+    }
+
+    function upsertConversation(sessionId, incoming) {
+      const session = ensureSession(sessionId);
+      const list = session.conversations;
+      let index = -1;
+
+      if (incoming.conversation_id) {
+        index = list.findIndex((c) => String(c.conversation_id) === String(incoming.conversation_id));
+      }
+      if (index === -1 && incoming.local_id) {
+        index = list.findIndex((c) => c.local_id === incoming.local_id);
+      }
+
+      if (index === -1) {
+        list.push(incoming);
+        return incoming;
+      }
+
+      mergeConversation(list[index], incoming);
+      return list[index];
+    }
+
+    function migrateSession(oldId, newId) {
+      if (!sessionStore.has(oldId) || oldId === newId) return;
+      const oldSession = sessionStore.get(oldId);
+      const target = sessionStore.get(newId) || { sessionId: newId, conversations: [] };
+      oldSession.conversations.forEach((conv) => {
+        upsertConversation(newId, conv);
+      });
+      sessionStore.set(newId, target);
+      sessionStore.delete(oldId);
+      if (activeSessionId === oldId) {
+        activeSessionId = newId;
+      }
+      if (currentStream && currentStream.sessionId === oldId) {
+        currentStream.sessionId = newId;
+      }
+    }
+
+    function syncHistory(items) {
+      items.forEach((item) => {
+        const sessionId = item.session_id || 'unknown';
+        const incoming = {
+          conversation_id: item.conversation_id ? String(item.conversation_id) : null,
+          timestamp: item.timestamp || '',
+          user_input: item.user_input || '',
+          status: item.status || 'unknown',
+          final_answer: item.final_answer || '',
+          ward_html: item.ward_html || '',
+        };
+        upsertConversation(sessionId, incoming);
+      });
+    }
+
+    function syncSessionPayload(payload) {
+      const sessionId = payload.session_id || 'unknown';
+      const conversations = payload.conversations || [];
+      conversations.forEach((conv) => {
+        const incoming = {
+          conversation_id: conv.conversation_id ? String(conv.conversation_id) : null,
+          timestamp: conv.timestamp || '',
+          user_input: conv.user_input || '',
+          status: conv.status || 'unknown',
+          final_answer: conv.final_answer || '',
+          ward_html: conv.ward_html || '',
+        };
+        upsertConversation(sessionId, incoming);
+      });
+    }
+
+    function handleSessionEvent(payload) {
+      const sessionId = payload.session_id;
+      if (!sessionId) return;
+      const conversationId = payload.conversation_id ? String(payload.conversation_id) : null;
+      const timestamp = payload.timestamp || new Date().toISOString();
+
+      if (currentStream) {
+        if (currentStream.sessionId && currentStream.sessionId.startsWith('temp-')) {
+          migrateSession(currentStream.sessionId, sessionId);
+        }
+        currentStream.sessionId = sessionId;
+
+        let conversation = currentStream.conversationRef;
+        if (!conversation) {
+          tempSessionCounter += 1;
+          conversation = {
+            local_id: `local-${Date.now()}-${tempSessionCounter}`,
+            conversation_id: conversationId,
+            timestamp,
+            user_input: currentStream.userInput || '',
+            final_answer: currentStream.finalBuffer || '',
+            status: 'running',
+            ward_html: currentStream.wardHtml || '',
+          };
+          ensureSession(sessionId).conversations.push(conversation);
+          currentStream.conversationRef = conversation;
+        } else if (conversationId) {
+          conversation.conversation_id = conversationId;
+          conversation.timestamp = conversation.timestamp || timestamp;
+        }
+      } else {
+        ensureSession(sessionId);
+      }
+
+      activeSessionId = sessionId;
+      renderHistoryFromStore();
+    }
+
+    function renderHistoryFromStore() {
+      const sessions = Array.from(sessionStore.values());
+      historyList.innerHTML = '';
+      if (!sessions.length) {
+        const empty = document.createElement('div');
+        empty.className = 'history-meta';
+        empty.textContent = '暂无历史记录';
+        historyList.appendChild(empty);
+        return;
+      }
+
+      const viewModels = sessions.map((session) => {
+        const list = [...session.conversations].sort(compareConversations);
+        const latest = list[list.length - 1];
+        const running = list.some((conv) => conv.status === 'running');
+        return {
+          sessionId: session.sessionId,
+          latestTimestamp: latest?.timestamp || '',
+          firstTitle: latest?.user_input || '未命名对话',
+          count: list.length,
+          running,
+        };
+      });
+
+      viewModels.sort((a, b) => (a.latestTimestamp || '').localeCompare(b.latestTimestamp || '')).reverse();
+
+      viewModels.forEach((session) => {
+        const btn = document.createElement('button');
+        btn.className = 'history-item';
+        btn.type = 'button';
+        btn.dataset.sessionId = session.sessionId;
+        const title = document.createElement('div');
+        title.className = 'history-title';
+        title.textContent = session.firstTitle;
+        const meta = document.createElement('div');
+        meta.className = 'history-meta';
+        meta.textContent = `${session.latestTimestamp || ''} · ${session.count} 条对话${session.running ? ' · 进行中' : ''}`;
+        btn.appendChild(title);
+        btn.appendChild(meta);
+        btn.addEventListener('click', async () => {
+          await loadSession(session.sessionId, btn);
+        });
+        historyList.appendChild(btn);
+      });
+
+      if (activeSessionId) {
+        const activeBtn = historyList.querySelector(`[data-session-id="${activeSessionId}"]`);
+        setActiveHistoryItem(activeBtn);
+      }
+    }
+
+    function getSessionSignature(sessionId) {
+      const session = sessionStore.get(sessionId);
+      if (!session) return null;
+      const list = [...session.conversations].sort(compareConversations);
+      const latest = list[list.length - 1];
+      const running = list.some((conv) => conv.status === 'running');
+      const latestId = latest?.conversation_id || latest?.local_id || '';
+      return `${list.length}|${latestId}|${latest?.timestamp || ''}|${latest?.status || ''}|${running}`;
+    }
+
+    function renderSessionConversations(conversations) {
+      clearChat();
+      if (presetPanel) {
+        presetPanel.classList.add('hidden');
+      }
+      conversations
+        .sort(compareConversations)
+        .forEach((conv) => {
+          appendUserMessage(conv.user_input || '', true);
+          if (
+            currentStream
+            && activeSessionId === currentStream.sessionId
+            && currentStream.conversationRef
+            && isSameConversation(conv, currentStream.conversationRef)
+            && (conv.status === 'running' || currentStream.status === 'running')
+          ) {
+            const ui = createAssistantMessage();
+            ui.finalText.innerHTML = renderMarkdown(currentStream.finalBuffer || '');
+            if (currentStream.wardHtml) {
+              const iframe = document.createElement('iframe');
+              iframe.src = currentStream.wardHtml;
+              iframe.loading = 'lazy';
+              ui.embed.appendChild(iframe);
+            }
+            if (currentStream.hasResponse) {
+              ui.typing.classList.add('hidden');
+            }
+            if (currentStream.statusBuffer) {
+              ui.status.classList.add('visible');
+              ui.statusText.textContent = currentStream.statusBuffer;
+              ui.thinking.classList.remove('hidden');
+            } else if (currentStream.hasResponse) {
+              ui.thinking.classList.remove('hidden');
+            }
+            currentStream.ui = ui;
+            currentStream.detached = false;
+            currentStream.useTyper = false;
+          } else {
+            appendAssistantFinal(conv.final_answer || '', conv.ward_html || '', true);
+          }
+        });
+      activeSessionSignature = getSessionSignature(activeSessionId);
+    }
+
+    async function loadHistory() {
+      try {
+        const response = await fetch('/api/history');
+        if (!response.ok) return;
+        const payload = await response.json();
+        syncHistory(payload.items || []);
+        renderHistoryFromStore();
+      } catch (e) {
+        historyList.textContent = '';
+      }
+    }
+
+    function refreshActiveSession() {
+      if (!activeSessionId || activeSessionId.startsWith('temp-')) {
+        return;
+      }
+      if (currentStream && currentStream.detached === false) {
+        return;
+      }
+      const signature = getSessionSignature(activeSessionId);
+      if (!signature) return;
+      if (signature === activeSessionSignature) {
+        return;
+      }
+      activeSessionSignature = signature;
+      loadSession(activeSessionId);
+    }
+
+    function startHistoryPolling() {
+      if (historyPollTimer) return;
+      historyPollTimer = setInterval(() => {
+        if (!document.hidden) {
+          loadHistory().finally(refreshActiveSession);
+        }
+      }, HISTORY_POLL_INTERVAL);
+    }
+
+    async function loadSession(sessionId, btn) {
+      if (currentStream) {
+        currentStream.detached = currentStream.sessionId !== sessionId;
+        if (currentStream.detached) {
+          currentStream.ui = null;
+        }
+      }
+      activeSessionId = sessionId;
+      if (btn) {
+        setActiveHistoryItem(btn);
+      }
+      const local = sessionStore.get(sessionId);
+      if (local) {
+        renderSessionConversations(local.conversations);
+      }
+
+      if (sessionId.startsWith('temp-')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/sessions/${sessionId}`);
+        if (!response.ok) return;
+        const payload = await response.json();
+        syncSessionPayload(payload);
+        if (activeSessionId === sessionId) {
+          const session = sessionStore.get(sessionId);
+          if (session) {
+            renderSessionConversations(session.conversations);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function createAssistantMessage() {
+      const { bubble } = createMessage('assistant');
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>正在等待回复...';
+      const status = document.createElement('div');
+      status.className = 'status';
+      const statusText = document.createElement('div');
+      statusText.className = 'status-text';
+      const thinking = document.createElement('div');
+      thinking.className = 'thinking hidden';
+      thinking.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>思考中...';
+      const finalText = document.createElement('div');
+      const embed = document.createElement('div');
+      embed.className = 'embed';
+      bubble.appendChild(typing);
+      bubble.appendChild(status);
+      status.appendChild(statusText);
+      status.appendChild(thinking);
+      bubble.appendChild(finalText);
+      bubble.appendChild(embed);
+      return { typing, status, statusText, thinking, finalText, embed };
+    }
+
+    function createTyper(target, speed = 18) {
+      let queue = '';
+      let timer = null;
+
+      const step = () => {
+        if (!queue) {
+          timer = null;
+          return;
+        }
+        target.textContent += queue[0];
+        queue = queue.slice(1);
+        timer = setTimeout(step, speed);
+      };
+
+      const enqueue = (text) => {
+        if (!text) return;
+        queue += text;
+        if (!timer) {
+          step();
+        }
+      };
+
+      const clear = () => {
+        queue = '';
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        target.textContent = '';
+      };
+
+      const flush = () => {
+        if (queue) {
+          target.textContent += queue;
+          queue = '';
+        }
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      };
+
+      return { enqueue, clear, flush };
+    }
+
+    function autoResize() {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+    }
+
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+
+      if (presetPanel) {
+        presetPanel.classList.add('hidden');
+      }
+      const useNewSession = pendingNewSession;
+      pendingNewSession = false;
+      if (useNewSession) {
+        activeSessionId = null;
+        setActiveHistoryItem(null);
+      }
+
+      const userMessage = appendUserMessage(message);
+      input.value = '';
+      autoResize();
+      sendBtn.disabled = true;
+      sendBtn.classList.add('loading');
+
+      const { typing, status, statusText, thinking, finalText, embed } = createAssistantMessage();
+      const statusTyper = createTyper(statusText, STATUS_TYPER_SPEED);
+      const finalTyper = createTyper(finalText, FINAL_TYPER_SPEED);
+      let hasResponse = false;
+      currentStream = {
+        sessionId: null,
+        conversationRef: null,
+        finalBuffer: '',
+        wardHtml: '',
+        userInput: message,
+        status: 'running',
+        statusBuffer: '',
+        hasResponse: false,
+        ui: { typing, status, statusText, thinking, finalText, embed },
+        detached: false,
+        useTyper: true,
+      };
+      startHistoryPolling();
+
+      if (useNewSession) {
+        const tempSession = createTempSession(message);
+        currentStream.sessionId = tempSession.sessionId;
+        currentStream.conversationRef = tempSession.conversation;
+        activeSessionId = tempSession.sessionId;
+        renderHistoryFromStore();
+      } else if (activeSessionId && sessionStore.has(activeSessionId)) {
+        tempSessionCounter += 1;
+        const conversation = {
+          local_id: `local-${Date.now()}-${tempSessionCounter}`,
+          conversation_id: null,
+          timestamp: new Date().toISOString(),
+          user_input: message,
+          final_answer: '',
+          status: 'running',
+          ward_html: '',
+        };
+        currentStream.sessionId = activeSessionId;
+        currentStream.conversationRef = upsertConversation(activeSessionId, conversation);
+        renderHistoryFromStore();
+      }
+
+      const payload = { message, new_session: useNewSession };
+      if (!useNewSession && activeSessionId && !activeSessionId.startsWith('temp-')) {
+        payload.session_id = activeSessionId;
+      }
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok || !response.body) {
+          const errorText = await response.text();
+          finalText.textContent = errorText || 'Request failed.';
+          if (currentStream && currentStream.conversationRef) {
+            currentStream.conversationRef.final_answer = errorText || 'Request failed.';
+            currentStream.conversationRef.status = 'error';
+            renderHistoryFromStore();
+          }
+          return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        status.classList.add('visible');
+        thinking.classList.remove('hidden');
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n');
+          buffer = parts.pop();
+
+          for (const line of parts) {
+            if (!line.trim()) continue;
+            let payload;
+            try {
+              payload = JSON.parse(line);
+            } catch (e) {
+              continue;
+            }
+            if (payload.type === 'session') {
+              handleSessionEvent(payload);
+              continue;
+            }
+            if (!hasResponse) {
+              hasResponse = true;
+              if (currentStream) {
+                currentStream.hasResponse = true;
+              }
+              typing.classList.add('hidden');
+              userMessage.wrapper.classList.remove('sending');
+            }
+
+            if (payload.type === 'thought') {
+              appendStatusBuffer(currentStream, `Thought: ${payload.content}\n\n`);
+              if (currentStream && currentStream.ui && currentStream.detached === false && !currentStream.useTyper) {
+                currentStream.ui.status.classList.add('visible');
+                currentStream.ui.statusText.textContent = currentStream.statusBuffer;
+                currentStream.ui.thinking.classList.remove('hidden');
+              }
+              if (!currentStream || (!currentStream.detached && currentStream.useTyper)) {
+                statusTyper.enqueue(`Thought: ${payload.content}\n\n`);
+              }
+            } else if (payload.type === 'action') {
+              const inputText = payload.input ? JSON.stringify(payload.input) : '';
+              appendStatusBuffer(currentStream, `Action: ${payload.content}\nAction Input: ${inputText}\n\n`);
+              if (currentStream && currentStream.ui && currentStream.detached === false && !currentStream.useTyper) {
+                currentStream.ui.status.classList.add('visible');
+                currentStream.ui.statusText.textContent = currentStream.statusBuffer;
+                currentStream.ui.thinking.classList.remove('hidden');
+              }
+              if (!currentStream || (!currentStream.detached && currentStream.useTyper)) {
+                statusTyper.enqueue(`Action: ${payload.content}\nAction Input: ${inputText}\n\n`);
+              }
+            } else if (payload.type === 'observation') {
+              const obsText = truncateText(payload.content || '', MAX_OBSERVATION_CHARS);
+              appendStatusBuffer(currentStream, `Observation: ${obsText}\n\n`);
+              if (currentStream && currentStream.ui && currentStream.detached === false && !currentStream.useTyper) {
+                currentStream.ui.status.classList.add('visible');
+                currentStream.ui.statusText.textContent = currentStream.statusBuffer;
+                currentStream.ui.thinking.classList.remove('hidden');
+              }
+              if (!currentStream || (!currentStream.detached && currentStream.useTyper)) {
+                statusTyper.enqueue(`Observation: ${obsText}\n\n`);
+              }
+            } else if (payload.type === 'final_delta') {
+              if (currentStream) {
+                currentStream.finalBuffer += payload.content || '';
+                if (currentStream.conversationRef) {
+                  currentStream.conversationRef.final_answer = currentStream.finalBuffer;
+                }
+              }
+              if (!currentStream || (!currentStream.detached && currentStream.useTyper)) {
+                finalTyper.enqueue(payload.content || '');
+              }
+              if (currentStream && currentStream.ui && currentStream.detached === false && !currentStream.useTyper) {
+                currentStream.ui.finalText.innerHTML = renderMarkdown(currentStream.finalBuffer || '');
+              }
+            } else if (payload.type === 'final') {
+              statusTyper.clear();
+              status.classList.remove('visible');
+              thinking.classList.add('hidden');
+              typing.classList.add('hidden');
+              finalTyper.flush();
+              const finalContent = payload.content || (currentStream ? currentStream.finalBuffer : '');
+              finalText.innerHTML = renderMarkdown(finalContent || '');
+              if (payload.ward_html) {
+                const existing = embed.querySelector(`iframe[src="${payload.ward_html}"]`);
+                if (!existing) {
+                  embed.innerHTML = '';
+                  const iframe = document.createElement('iframe');
+                  iframe.src = payload.ward_html;
+                  iframe.loading = 'lazy';
+                  embed.appendChild(iframe);
+                }
+              }
+              if (currentStream && currentStream.ui && currentStream.detached === false) {
+                currentStream.ui.status.classList.remove('visible');
+                currentStream.ui.thinking.classList.add('hidden');
+                currentStream.ui.typing.classList.add('hidden');
+                currentStream.ui.finalText.innerHTML = renderMarkdown(finalContent || '');
+                if (payload.ward_html && currentStream.ui.embed) {
+                  const existing = currentStream.ui.embed.querySelector(`iframe[src="${payload.ward_html}"]`);
+                  if (!existing) {
+                    currentStream.ui.embed.innerHTML = '';
+                    const iframe = document.createElement('iframe');
+                    iframe.src = payload.ward_html;
+                    iframe.loading = 'lazy';
+                    currentStream.ui.embed.appendChild(iframe);
+                  }
+                }
+              }
+              if (currentStream && currentStream.conversationRef) {
+                currentStream.conversationRef.final_answer = finalContent || '';
+                currentStream.conversationRef.ward_html = payload.ward_html || '';
+                currentStream.conversationRef.status = 'success';
+              }
+              loadHistory();
+            }
+
+            chat.scrollTop = chat.scrollHeight;
+          }
+        }
+      } catch (err) {
+        statusTyper.clear();
+        finalTyper.clear();
+        typing.classList.add('hidden');
+        thinking.classList.add('hidden');
+        userMessage.wrapper.classList.remove('sending');
+        finalText.textContent = 'Network error.';
+        if (currentStream && currentStream.conversationRef) {
+          currentStream.conversationRef.final_answer = 'Network error.';
+          currentStream.conversationRef.status = 'error';
+          renderHistoryFromStore();
+        }
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.classList.remove('loading');
+        currentStream = null;
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('input', autoResize);
+    newChatBtn.addEventListener('click', () => {
+      clearChat();
+      setActiveHistoryItem(null);
+      activeSessionId = null;
+      if (currentStream) {
+        currentStream.detached = true;
+        currentStream.ui = null;
+      }
+      pendingNewSession = true;
+    });
+    if (presetPanel) {
+      presetPanel.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-preset]');
+        if (!target) return;
+        const preset = target.getAttribute('data-preset');
+        if (!preset) return;
+        pendingNewSession = true;
+        input.value = preset;
+        autoResize();
+        sendMessage();
+      });
+    }
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+    loadHistory();
+    startHistoryPolling();
+  </script>
+</body>
+</html>

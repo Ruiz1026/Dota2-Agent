@@ -1,0 +1,1078 @@
+{
+  "player_matches": [
+    {
+      "column": "match_id",
+      "type": "bigint"
+    },
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "player_slot",
+      "type": "integer"
+    },
+    {
+      "column": "hero_id",
+      "type": "integer"
+    },
+    {
+      "column": "item_0",
+      "type": "integer"
+    },
+    {
+      "column": "item_1",
+      "type": "integer"
+    },
+    {
+      "column": "item_2",
+      "type": "integer"
+    },
+    {
+      "column": "item_3",
+      "type": "integer"
+    },
+    {
+      "column": "item_4",
+      "type": "integer"
+    },
+    {
+      "column": "item_5",
+      "type": "integer"
+    },
+    {
+      "column": "kills",
+      "type": "integer"
+    },
+    {
+      "column": "deaths",
+      "type": "integer"
+    },
+    {
+      "column": "assists",
+      "type": "integer"
+    },
+    {
+      "column": "leaver_status",
+      "type": "integer"
+    },
+    {
+      "column": "gold",
+      "type": "integer"
+    },
+    {
+      "column": "last_hits",
+      "type": "integer"
+    },
+    {
+      "column": "denies",
+      "type": "integer"
+    },
+    {
+      "column": "gold_per_min",
+      "type": "integer"
+    },
+    {
+      "column": "xp_per_min",
+      "type": "integer"
+    },
+    {
+      "column": "gold_spent",
+      "type": "integer"
+    },
+    {
+      "column": "hero_damage",
+      "type": "integer"
+    },
+    {
+      "column": "tower_damage",
+      "type": "bigint"
+    },
+    {
+      "column": "hero_healing",
+      "type": "bigint"
+    },
+    {
+      "column": "level",
+      "type": "integer"
+    },
+    {
+      "column": "additional_units",
+      "type": "ARRAY"
+    },
+    {
+      "column": "stuns",
+      "type": "real"
+    },
+    {
+      "column": "max_hero_hit",
+      "type": "json"
+    },
+    {
+      "column": "times",
+      "type": "ARRAY"
+    },
+    {
+      "column": "gold_t",
+      "type": "ARRAY"
+    },
+    {
+      "column": "lh_t",
+      "type": "ARRAY"
+    },
+    {
+      "column": "xp_t",
+      "type": "ARRAY"
+    },
+    {
+      "column": "obs_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "sen_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "purchase_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "kills_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "buyback_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "lane_pos",
+      "type": "json"
+    },
+    {
+      "column": "obs",
+      "type": "json"
+    },
+    {
+      "column": "sen",
+      "type": "json"
+    },
+    {
+      "column": "actions",
+      "type": "json"
+    },
+    {
+      "column": "pings",
+      "type": "json"
+    },
+    {
+      "column": "purchase",
+      "type": "json"
+    },
+    {
+      "column": "gold_reasons",
+      "type": "json"
+    },
+    {
+      "column": "xp_reasons",
+      "type": "json"
+    },
+    {
+      "column": "killed",
+      "type": "json"
+    },
+    {
+      "column": "item_uses",
+      "type": "json"
+    },
+    {
+      "column": "ability_uses",
+      "type": "json"
+    },
+    {
+      "column": "hero_hits",
+      "type": "json"
+    },
+    {
+      "column": "damage",
+      "type": "json"
+    },
+    {
+      "column": "damage_taken",
+      "type": "json"
+    },
+    {
+      "column": "damage_inflictor",
+      "type": "json"
+    },
+    {
+      "column": "runes",
+      "type": "json"
+    },
+    {
+      "column": "killed_by",
+      "type": "json"
+    },
+    {
+      "column": "kill_streaks",
+      "type": "json"
+    },
+    {
+      "column": "multi_kills",
+      "type": "json"
+    },
+    {
+      "column": "life_state",
+      "type": "json"
+    },
+    {
+      "column": "damage_inflictor_received",
+      "type": "json"
+    },
+    {
+      "column": "obs_placed",
+      "type": "integer"
+    },
+    {
+      "column": "sen_placed",
+      "type": "integer"
+    },
+    {
+      "column": "creeps_stacked",
+      "type": "integer"
+    },
+    {
+      "column": "camps_stacked",
+      "type": "integer"
+    },
+    {
+      "column": "rune_pickups",
+      "type": "integer"
+    },
+    {
+      "column": "obs_left_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "sen_left_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "ability_upgrades_arr",
+      "type": "ARRAY"
+    },
+    {
+      "column": "party_id",
+      "type": "integer"
+    },
+    {
+      "column": "permanent_buffs",
+      "type": "ARRAY"
+    },
+    {
+      "column": "backpack_0",
+      "type": "integer"
+    },
+    {
+      "column": "backpack_1",
+      "type": "integer"
+    },
+    {
+      "column": "backpack_2",
+      "type": "integer"
+    },
+    {
+      "column": "runes_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "lane",
+      "type": "integer"
+    },
+    {
+      "column": "lane_role",
+      "type": "integer"
+    },
+    {
+      "column": "is_roaming",
+      "type": "boolean"
+    },
+    {
+      "column": "firstblood_claimed",
+      "type": "integer"
+    },
+    {
+      "column": "teamfight_participation",
+      "type": "real"
+    },
+    {
+      "column": "towers_killed",
+      "type": "integer"
+    },
+    {
+      "column": "roshans_killed",
+      "type": "integer"
+    },
+    {
+      "column": "observers_placed",
+      "type": "integer"
+    },
+    {
+      "column": "party_size",
+      "type": "integer"
+    },
+    {
+      "column": "ability_targets",
+      "type": "json"
+    },
+    {
+      "column": "damage_targets",
+      "type": "json"
+    },
+    {
+      "column": "dn_t",
+      "type": "ARRAY"
+    },
+    {
+      "column": "connection_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "backpack_3",
+      "type": "integer"
+    },
+    {
+      "column": "item_neutral",
+      "type": "integer"
+    },
+    {
+      "column": "net_worth",
+      "type": "integer"
+    },
+    {
+      "column": "hero_variant",
+      "type": "integer"
+    },
+    {
+      "column": "neutral_tokens_log",
+      "type": "ARRAY"
+    },
+    {
+      "column": "neutral_item_history",
+      "type": "ARRAY"
+    }
+  ],
+  "matches": [
+    {
+      "column": "match_id",
+      "type": "bigint"
+    },
+    {
+      "column": "match_seq_num",
+      "type": "bigint"
+    },
+    {
+      "column": "radiant_win",
+      "type": "boolean"
+    },
+    {
+      "column": "start_time",
+      "type": "bigint"
+    },
+    {
+      "column": "duration",
+      "type": "integer"
+    },
+    {
+      "column": "tower_status_radiant",
+      "type": "integer"
+    },
+    {
+      "column": "tower_status_dire",
+      "type": "integer"
+    },
+    {
+      "column": "barracks_status_radiant",
+      "type": "integer"
+    },
+    {
+      "column": "barracks_status_dire",
+      "type": "integer"
+    },
+    {
+      "column": "cluster",
+      "type": "integer"
+    },
+    {
+      "column": "first_blood_time",
+      "type": "integer"
+    },
+    {
+      "column": "lobby_type",
+      "type": "integer"
+    },
+    {
+      "column": "human_players",
+      "type": "integer"
+    },
+    {
+      "column": "leagueid",
+      "type": "integer"
+    },
+    {
+      "column": "positive_votes",
+      "type": "integer"
+    },
+    {
+      "column": "negative_votes",
+      "type": "integer"
+    },
+    {
+      "column": "game_mode",
+      "type": "integer"
+    },
+    {
+      "column": "engine",
+      "type": "integer"
+    },
+    {
+      "column": "picks_bans",
+      "type": "ARRAY"
+    },
+    {
+      "column": "radiant_team_id",
+      "type": "integer"
+    },
+    {
+      "column": "dire_team_id",
+      "type": "integer"
+    },
+    {
+      "column": "radiant_team_name",
+      "type": "text"
+    },
+    {
+      "column": "dire_team_name",
+      "type": "text"
+    },
+    {
+      "column": "radiant_team_complete",
+      "type": "smallint"
+    },
+    {
+      "column": "dire_team_complete",
+      "type": "smallint"
+    },
+    {
+      "column": "radiant_captain",
+      "type": "bigint"
+    },
+    {
+      "column": "dire_captain",
+      "type": "bigint"
+    },
+    {
+      "column": "chat",
+      "type": "ARRAY"
+    },
+    {
+      "column": "objectives",
+      "type": "ARRAY"
+    },
+    {
+      "column": "radiant_gold_adv",
+      "type": "ARRAY"
+    },
+    {
+      "column": "radiant_xp_adv",
+      "type": "ARRAY"
+    },
+    {
+      "column": "teamfights",
+      "type": "ARRAY"
+    },
+    {
+      "column": "version",
+      "type": "integer"
+    },
+    {
+      "column": "cosmetics",
+      "type": "json"
+    },
+    {
+      "column": "radiant_score",
+      "type": "integer"
+    },
+    {
+      "column": "dire_score",
+      "type": "integer"
+    },
+    {
+      "column": "draft_timings",
+      "type": "ARRAY"
+    },
+    {
+      "column": "series_id",
+      "type": "integer"
+    },
+    {
+      "column": "series_type",
+      "type": "integer"
+    },
+    {
+      "column": "replay_salt",
+      "type": "integer"
+    }
+  ],
+  "players  // 玩家数据列表": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "steamid",
+      "type": "text"
+    },
+    {
+      "column": "avatar",
+      "type": "text"
+    },
+    {
+      "column": "avatarmedium",
+      "type": "text"
+    },
+    {
+      "column": "avatarfull",
+      "type": "text"
+    },
+    {
+      "column": "profileurl",
+      "type": "text"
+    },
+    {
+      "column": "personaname",
+      "type": "text"
+    },
+    {
+      "column": "last_login",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "full_history_time",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "cheese",
+      "type": "integer"
+    },
+    {
+      "column": "fh_unavailable",
+      "type": "boolean"
+    },
+    {
+      "column": "loccountrycode",
+      "type": "text"
+    },
+    {
+      "column": "last_match_time",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "plus",
+      "type": "boolean"
+    },
+    {
+      "column": "profile_time",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "rank_tier_time",
+      "type": "timestamp with time zone"
+    }
+  ],
+  "public_matches": [
+    {
+      "column": "match_id",
+      "type": "bigint"
+    },
+    {
+      "column": "match_seq_num",
+      "type": "bigint"
+    },
+    {
+      "column": "radiant_win",
+      "type": "boolean"
+    },
+    {
+      "column": "start_time",
+      "type": "bigint"
+    },
+    {
+      "column": "duration",
+      "type": "integer"
+    },
+    {
+      "column": "lobby_type",
+      "type": "integer"
+    },
+    {
+      "column": "game_mode",
+      "type": "integer"
+    },
+    {
+      "column": "avg_rank_tier",
+      "type": "double precision"
+    },
+    {
+      "column": "num_rank_tier",
+      "type": "integer"
+    },
+    {
+      "column": "cluster",
+      "type": "integer"
+    },
+    {
+      "column": "radiant_team",
+      "type": "ARRAY"
+    },
+    {
+      "column": "dire_team",
+      "type": "ARRAY"
+    }
+  ],
+  "cosmetics  // 饰品数据": [
+    {
+      "column": "item_id",
+      "type": "integer"
+    },
+    {
+      "column": "name",
+      "type": "text"
+    },
+    {
+      "column": "prefab",
+      "type": "text"
+    },
+    {
+      "column": "creation_date",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "image_inventory",
+      "type": "text"
+    },
+    {
+      "column": "image_path",
+      "type": "text"
+    },
+    {
+      "column": "item_description",
+      "type": "text"
+    },
+    {
+      "column": "item_name",
+      "type": "text"
+    },
+    {
+      "column": "item_rarity",
+      "type": "text"
+    },
+    {
+      "column": "item_type_name",
+      "type": "text"
+    },
+    {
+      "column": "used_by_heroes",
+      "type": "text"
+    }
+  ],
+  "notable_players": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "name",
+      "type": "text"
+    },
+    {
+      "column": "country_code",
+      "type": "text"
+    },
+    {
+      "column": "fantasy_role",
+      "type": "integer"
+    },
+    {
+      "column": "team_id",
+      "type": "integer"
+    },
+    {
+      "column": "team_name",
+      "type": "text"
+    },
+    {
+      "column": "team_tag",
+      "type": "text"
+    },
+    {
+      "column": "is_locked",
+      "type": "boolean"
+    },
+    {
+      "column": "is_pro",
+      "type": "boolean"
+    },
+    {
+      "column": "locked_until",
+      "type": "integer"
+    }
+  ],
+  "queue": [
+    {
+      "column": "id",
+      "type": "bigint"
+    },
+    {
+      "column": "type",
+      "type": "text"
+    },
+    {
+      "column": "timestamp",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "attempts",
+      "type": "integer"
+    },
+    {
+      "column": "data",
+      "type": "json"
+    },
+    {
+      "column": "next_attempt_time",
+      "type": "timestamp with time zone"
+    },
+    {
+      "column": "priority",
+      "type": "integer"
+    },
+    {
+      "column": "job_key",
+      "type": "text"
+    }
+  ],
+  "heroes": [
+    {
+      "column": "id",
+      "type": "integer"
+    },
+    {
+      "column": "name",
+      "type": "text"
+    },
+    {
+      "column": "localized_name",
+      "type": "text"
+    },
+    {
+      "column": "primary_attr",
+      "type": "text"
+    },
+    {
+      "column": "attack_type",
+      "type": "text"
+    },
+    {
+      "column": "roles",
+      "type": "ARRAY"
+    },
+    {
+      "column": "legs",
+      "type": "integer"
+    }
+  ],
+  "items": [
+    {
+      "column": "id",
+      "type": "integer"
+    },
+    {
+      "column": "name",
+      "type": "text"
+    },
+    {
+      "column": "cost",
+      "type": "integer"
+    },
+    {
+      "column": "secret_shop",
+      "type": "smallint"
+    },
+    {
+      "column": "side_shop",
+      "type": "smallint"
+    },
+    {
+      "column": "recipe",
+      "type": "smallint"
+    },
+    {
+      "column": "localized_name",
+      "type": "text"
+    }
+  ],
+  "scenarios": [
+    {
+      "column": "hero_id",
+      "type": "smallint"
+    },
+    {
+      "column": "item",
+      "type": "text"
+    },
+    {
+      "column": "time",
+      "type": "integer"
+    },
+    {
+      "column": "lane_role",
+      "type": "smallint"
+    },
+    {
+      "column": "games",
+      "type": "bigint"
+    },
+    {
+      "column": "wins",
+      "type": "bigint"
+    },
+    {
+      "column": "epoch_week",
+      "type": "integer"
+    }
+  ],
+  "team_rating": [
+    {
+      "column": "team_id",
+      "type": "bigint"
+    },
+    {
+      "column": "rating",
+      "type": "real"
+    },
+    {
+      "column": "wins",
+      "type": "integer"
+    },
+    {
+      "column": "losses",
+      "type": "integer"
+    },
+    {
+      "column": "last_match_time",
+      "type": "bigint"
+    },
+    {
+      "column": "delta",
+      "type": "real"
+    },
+    {
+      "column": "match_id",
+      "type": "bigint"
+    }
+  ],
+  "api_key_usage": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "customer_id",
+      "type": "text"
+    },
+    {
+      "column": "api_key",
+      "type": "uuid"
+    },
+    {
+      "column": "usage_count",
+      "type": "bigint"
+    },
+    {
+      "column": "ip",
+      "type": "text"
+    },
+    {
+      "column": "timestamp",
+      "type": "timestamp without time zone"
+    }
+  ],
+  "team_scenarios": [
+    {
+      "column": "scenario",
+      "type": "text"
+    },
+    {
+      "column": "is_radiant",
+      "type": "boolean"
+    },
+    {
+      "column": "region",
+      "type": "smallint"
+    },
+    {
+      "column": "games",
+      "type": "bigint"
+    },
+    {
+      "column": "wins",
+      "type": "bigint"
+    },
+    {
+      "column": "epoch_week",
+      "type": "integer"
+    }
+  ],
+  "api_keys": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "api_key",
+      "type": "uuid"
+    },
+    {
+      "column": "customer_id",
+      "type": "text"
+    },
+    {
+      "column": "subscription_id",
+      "type": "text"
+    },
+    {
+      "column": "is_canceled",
+      "type": "boolean"
+    }
+  ],
+  "leagues": [
+    {
+      "column": "leagueid",
+      "type": "bigint"
+    },
+    {
+      "column": "ticket",
+      "type": "text"
+    },
+    {
+      "column": "banner",
+      "type": "text"
+    },
+    {
+      "column": "tier",
+      "type": "text"
+    },
+    {
+      "column": "name",
+      "type": "text"
+    }
+  ],
+  "picks_bans  // BP选禁列表": [
+    {
+      "column": "match_id",
+      "type": "bigint"
+    },
+    {
+      "column": "is_pick",
+      "type": "boolean"
+    },
+    {
+      "column": "hero_id",
+      "type": "integer"
+    },
+    {
+      "column": "team",
+      "type": "smallint"
+    },
+    {
+      "column": "ord",
+      "type": "smallint"
+    }
+  ],
+  "player_ratings": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "match_id",
+      "type": "bigint"
+    },
+    {
+      "column": "solo_competitive_rank",
+      "type": "integer"
+    },
+    {
+      "column": "competitive_rank",
+      "type": "integer"
+    },
+    {
+      "column": "time",
+      "type": "timestamp with time zone"
+    }
+  ],
+  "player_computed_mmr": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "computed_mmr",
+      "type": "real"
+    },
+    {
+      "column": "delta",
+      "type": "real"
+    },
+    {
+      "column": "match_id",
+      "type": "bigint"
+    }
+  ],
+  "player_computed_mmr_turbo": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "computed_mmr",
+      "type": "real"
+    },
+    {
+      "column": "delta",
+      "type": "real"
+    },
+    {
+      "column": "match_id",
+      "type": "bigint"
+    }
+  ],
+  "player_match_history": [
+    {
+      "column": "account_id",
+      "type": "bigint"
+    },
+    {
+      "column": "match_id",
+      "type": "bigint"
+    },
+    {
+      "column": "player_slot",
+      "type": "integer"
+    },
+    {
+      "column": "retries",
+      "type": "integer"
+    }
+  ]
+}

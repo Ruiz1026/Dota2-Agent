@@ -1,0 +1,62 @@
+[
+  {
+    "team_id  // 战队ID": 7119388,
+    "rating  // 战队/玩家评分": 1543.55,
+    "wins  // 胜场数": 834,
+    "losses  // 负场数": 554,
+    "last_match_time  // 最后比赛时间": 1766341021,
+    "delta": -17.9257,
+    "match_id  // 比赛唯一ID": 8615531269,
+    "name  // 内部名称/代号": "Team Spirit",
+    "tag  // 战队标签/简称": "TSpirit",
+    "logo_url  // Logo URL": "https://cdn.steamusercontent.com/ugc/1839179120711951766/CD7E0885CB527334205CC7885E9C101B7BC17702/"
+  },
+  {
+    "team_id  // 战队ID": 9823272,
+    "rating  // 战队/玩家评分": 1537.39,
+    "wins  // 胜场数": 89,
+    "losses  // 负场数": 63,
+    "last_match_time  // 最后比赛时间": 1766341021,
+    "delta": 17.9257,
+    "match_id  // 比赛唯一ID": 8615531269,
+    "name  // 内部名称/代号": "Team Yandex",
+    "tag  // 战队标签/简称": "TY",
+    "logo_url  // Logo URL": "https://cdn.steamusercontent.com/ugc/12970505637628494427/B04C3358F4E815ADFC2F8B1B8BE3AB0CE75C8881/"
+  },
+  {
+    "team_id  // 战队ID": 7412785,
+    "rating  // 战队/玩家评分": 1520.12,
+    "wins  // 胜场数": 267,
+    "losses  // 负场数": 1,
+    "last_match_time  // 最后比赛时间": 1639928575,
+    "delta": null,
+    "match_id  // 比赛唯一ID": null,
+    "name  // 内部名称/代号": "CyberBonch-1",
+    "tag  // 战队标签/简称": "CB",
+    "logo_url  // Logo URL": "https://cdn.steamusercontent.com/ugc/1842537871043985153/774A1838BEB3E73BFDEFEC0EDFD97B4F5C62B838/"
+  },
+  {
+    "team_id  // 战队ID": 8605863,
+    "rating  // 战队/玩家评分": 1497.49,
+    "wins  // 胜场数": 326,
+    "losses  // 负场数": 243,
+    "last_match_time  // 最后比赛时间": 1726305637,
+    "delta": null,
+    "match_id  // 比赛唯一ID": null,
+    "name  // 内部名称/代号": "Cloud9",
+    "tag  // 战队标签/简称": "C9",
+    "logo_url  // Logo URL": "https://cdn.steamusercontent.com/ugc/2399941883261718982/81DE19B3FD9737B5F16C725D3FB7E72251BE2A81/"
+  },
+  {
+    "team_id  // 战队ID": 9572001,
+    "rating  // 战队/玩家评分": 1496.69,
+    "wins  // 胜场数": 233,
+    "losses  // 负场数": 123,
+    "last_match_time  // 最后比赛时间": 1767633766,
+    "delta": -22.0747,
+    "match_id  // 比赛唯一ID": 8636761702,
+    "name  // 内部名称/代号": "PARIVISION",
+    "tag  // 战队标签/简称": "PV",
+    "logo_url  // Logo URL": "https://cdn.steamusercontent.com/ugc/10501094611027794535/1569CC553CB72963C8EC4C3F807EE50DA925BDC2/"
+  }
+]

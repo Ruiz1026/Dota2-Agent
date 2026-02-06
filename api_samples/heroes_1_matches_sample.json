@@ -1,0 +1,72 @@
+[
+  {
+    "match_id": 8659584853,
+    "start_time": 1769088479,
+    "duration": 1668,
+    "radiant_win": false,
+    "leagueid": 19066,
+    "league_name": "肛宝联赛-老婆杯",
+    "radiant": true,
+    "player_slot": 132,
+    "account_id": 108559012,
+    "kills": 6,
+    "deaths": 2,
+    "assists": 6
+  },
+  {
+    "match_id": 8659045373,
+    "start_time": 1769043081,
+    "duration": 1818,
+    "radiant_win": false,
+    "leagueid": 19147,
+    "league_name": "CCT Dota 2 Season 2 South America Series 2",
+    "radiant": false,
+    "player_slot": 2,
+    "account_id": 197813893,
+    "kills": 4,
+    "deaths": 8,
+    "assists": 5
+  },
+  {
+    "match_id": 8658658031,
+    "start_time": 1769015307,
+    "duration": 1126,
+    "radiant_win": false,
+    "leagueid": 19147,
+    "league_name": "CCT Dota 2 Season 2 South America Series 2",
+    "radiant": true,
+    "player_slot": 131,
+    "account_id": 185202677,
+    "kills": 9,
+    "deaths": 3,
+    "assists": 9
+  },
+  {
+    "match_id": 8658463231,
+    "start_time": 1769006559,
+    "duration": 2251,
+    "radiant_win": false,
+    "leagueid": 18867,
+    "league_name": "Ultras Dota Pro League  2025-26",
+    "radiant": false,
+    "player_slot": 1,
+    "account_id": 1029972951,
+    "kills": 3,
+    "deaths": 4,
+    "assists": 6
+  },
+  {
+    "match_id": 8658353113,
+    "start_time": 1769001968,
+    "duration": 1760,
+    "radiant_win": false,
+    "leagueid": 18959,
+    "league_name": "Destiny League",
+    "radiant": true,
+    "player_slot": 129,
+    "account_id": 1880011613,
+    "kills": 6,
+    "deaths": 5,
+    "assists": 8
+  }
+]

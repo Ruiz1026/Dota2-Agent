@@ -1,0 +1,37 @@
+[
+  {
+    "account_id  // Steam账号ID(32位)": 328277330,
+    "avatarfull  // 头像URL(大)": "https://avatars.steamstatic.com/ae51a83db58680e228db0081a0ce91c601ad8d43_full.jpg",
+    "personaname  // Steam昵称": "Miracle",
+    "last_match_time  // 最后比赛时间": "2026-01-20T15:19:23.000Z",
+    "sml": 1
+  },
+  {
+    "account_id  // Steam账号ID(32位)": 1004418301,
+    "avatarfull  // 头像URL(大)": "https://avatars.steamstatic.com/8288386d0b359d764a060cb82169f029a129ba43_full.jpg",
+    "personaname  // Steam昵称": "Miracle★҉",
+    "last_match_time  // 最后比赛时间": "2026-01-20T15:05:28.000Z",
+    "sml": 1
+  },
+  {
+    "account_id  // Steam账号ID(32位)": 140864397,
+    "avatarfull  // 头像URL(大)": "https://avatars.steamstatic.com/3ddd51a0bab696b8f49beabd6a16064683fc76ba_full.jpg",
+    "personaname  // Steam昵称": "Miracle",
+    "last_match_time  // 最后比赛时间": "2026-01-20T15:03:22.000Z",
+    "sml": 1
+  },
+  {
+    "account_id  // Steam账号ID(32位)": 144764718,
+    "avatarfull  // 头像URL(大)": "https://avatars.steamstatic.com/b9db6052abeb5b8d9efb584088c93bc2b2845382_full.jpg",
+    "personaname  // Steam昵称": "Miracle-",
+    "last_match_time  // 最后比赛时间": "2026-01-20T14:52:48.000Z",
+    "sml": 1
+  },
+  {
+    "account_id  // Steam账号ID(32位)": 387484160,
+    "avatarfull  // 头像URL(大)": "https://avatars.steamstatic.com/9da68cf8a5b942112a038c30ad5522c84cd5098e_full.jpg",
+    "personaname  // Steam昵称": "Miracle-",
+    "last_match_time  // 最后比赛时间": "2026-01-20T14:51:14.000Z",
+    "sml": 1
+  }
+]

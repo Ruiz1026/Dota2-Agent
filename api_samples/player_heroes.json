@@ -1,0 +1,52 @@
+[
+  {
+    "hero_id  // 英雄ID": 1,
+    "last_played  // 最后一起游戏时间": 0,
+    "games  // 比赛场数": 0,
+    "win  // 是否获胜": 0,
+    "with_games  // 一起游戏场数": 0,
+    "with_win  // 一起获胜场数": 0,
+    "against_games  // 对抗场数": 0,
+    "against_win  // 对抗获胜场数": 0
+  },
+  {
+    "hero_id  // 英雄ID": 2,
+    "last_played  // 最后一起游戏时间": 0,
+    "games  // 比赛场数": 0,
+    "win  // 是否获胜": 0,
+    "with_games  // 一起游戏场数": 0,
+    "with_win  // 一起获胜场数": 0,
+    "against_games  // 对抗场数": 0,
+    "against_win  // 对抗获胜场数": 0
+  },
+  {
+    "hero_id  // 英雄ID": 3,
+    "last_played  // 最后一起游戏时间": 0,
+    "games  // 比赛场数": 0,
+    "win  // 是否获胜": 0,
+    "with_games  // 一起游戏场数": 0,
+    "with_win  // 一起获胜场数": 0,
+    "against_games  // 对抗场数": 0,
+    "against_win  // 对抗获胜场数": 0
+  },
+  {
+    "hero_id  // 英雄ID": 4,
+    "last_played  // 最后一起游戏时间": 0,
+    "games  // 比赛场数": 0,
+    "win  // 是否获胜": 0,
+    "with_games  // 一起游戏场数": 0,
+    "with_win  // 一起获胜场数": 0,
+    "against_games  // 对抗场数": 0,
+    "against_win  // 对抗获胜场数": 0
+  },
+  {
+    "hero_id  // 英雄ID": 5,
+    "last_played  // 最后一起游戏时间": 0,
+    "games  // 比赛场数": 0,
+    "win  // 是否获胜": 0,
+    "with_games  // 一起游戏场数": 0,
+    "with_win  // 一起获胜场数": 0,
+    "against_games  // 对抗场数": 0,
+    "against_win  // 对抗获胜场数": 0
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "dota2-assistant": {
+      "command": "python",
+      "args": [
+        "d:/111/0/hello_agents/mcp_server/dota2_fastmcp.py"
+      ]
+    }
+  }
+}

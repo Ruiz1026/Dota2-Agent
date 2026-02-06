@@ -1,0 +1,482 @@
+[
+  {
+    "activate_time  // 比赛激活时间": 1768917698,
+    "deactivate_time  // 比赛结束时间": 1768920351,
+    "server_steam_id  // 服务器Steam ID": "90280359949510687",
+    "lobby_id  // 大厅ID": "29671067200937315",
+    "league_id  // 联赛ID": 0,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 0,
+    "game_time  // 当前游戏时间(秒)": 2418,
+    "delay  // 延迟(秒)": 120,
+    "spectators  // 观众数": 185,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 22,
+    "average_mmr  // 平均MMR": 8947,
+    "match_id  // 比赛唯一ID": "8657167795",
+    "series_id  // 系列赛ID": 0,
+    "team_name_radiant  // 天辉战队名": "",
+    "team_name_dire  // 夜魇战队名": "",
+    "team_logo_radiant  // 天辉战队Logo": "0",
+    "team_logo_dire  // 夜魇战队Logo": "0",
+    "team_id_radiant  // 天辉战队ID": 0,
+    "team_id_dire  // 夜魇战队ID": 0,
+    "sort_score  // 排序分数(用于列表排序)": 9447,
+    "last_update_time  // 最后更新时间": 1768920200,
+    "radiant_lead  // 天辉经济领先值": -26295,
+    "radiant_score  // 天辉击杀数": 18,
+    "dire_score  // 夜魇击杀数": 27,
+    "players  // 玩家数据列表": [
+      {
+        "account_id  // Steam账号ID(32位)": 146345694,
+        "hero_id  // 英雄ID": 119,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 129685696,
+        "hero_id  // 英雄ID": 60,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 250221153,
+        "hero_id  // 英雄ID": 13,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 374828129,
+        "hero_id  // 英雄ID": 72,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 167402214,
+        "hero_id  // 英雄ID": 26,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 141133392,
+        "hero_id  // 英雄ID": 74,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 179802970,
+        "hero_id  // 英雄ID": 44,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 162272571,
+        "hero_id  // 英雄ID": 19,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 990826711,
+        "hero_id  // 英雄ID": 58,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 204353810,
+        "hero_id  // 英雄ID": 98,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      }
+    ],
+    "building_state  // 建筑状态(位掩码)": 9570084,
+    "weekend_tourney_tournament_id  // 周末联赛ID": 0,
+    "weekend_tourney_division  // 周末联赛分区": 0,
+    "weekend_tourney_skill_level  // 周末联赛技能等级": 0,
+    "weekend_tourney_bracket_round  // 周末联赛淘汰赛轮次": 0,
+    "custom_game_difficulty  // 自定义游戏难度": 0,
+    "is_player_draft  // 是否玩家选人模式": false,
+    "is_watch_eligible  // 是否可观战": true
+  },
+  {
+    "activate_time  // 比赛激活时间": 1768915233,
+    "deactivate_time  // 比赛结束时间": 0,
+    "server_steam_id  // 服务器Steam ID": "90280358969733122",
+    "lobby_id  // 大厅ID": "29671067164723213",
+    "league_id  // 联赛ID": 0,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 0,
+    "game_time  // 当前游戏时间(秒)": 1777,
+    "delay  // 延迟(秒)": 120,
+    "spectators  // 观众数": 137,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 22,
+    "average_mmr  // 平均MMR": 8943,
+    "match_id  // 比赛唯一ID": "8657109560",
+    "series_id  // 系列赛ID": 0,
+    "team_name_radiant  // 天辉战队名": "",
+    "team_name_dire  // 夜魇战队名": "",
+    "team_logo_radiant  // 天辉战队Logo": "0",
+    "team_logo_dire  // 夜魇战队Logo": "0",
+    "team_id_radiant  // 天辉战队ID": 0,
+    "team_id_dire  // 夜魇战队ID": 0,
+    "sort_score  // 排序分数(用于列表排序)": 9293,
+    "last_update_time  // 最后更新时间": 1768917100,
+    "radiant_lead  // 天辉经济领先值": -21992,
+    "radiant_score  // 天辉击杀数": 21,
+    "dire_score  // 夜魇击杀数": 32,
+    "players  // 玩家数据列表": [
+      {
+        "account_id  // Steam账号ID(32位)": 146345694,
+        "hero_id  // 英雄ID": 119,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 129685696,
+        "hero_id  // 英雄ID": 137,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 250221153,
+        "hero_id  // 英雄ID": 19,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 374828129,
+        "hero_id  // 英雄ID": 32,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 167402214,
+        "hero_id  // 英雄ID": 110,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 141133392,
+        "hero_id  // 英雄ID": 39,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 179802970,
+        "hero_id  // 英雄ID": 94,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 162272571,
+        "hero_id  // 英雄ID": 71,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 990826711,
+        "hero_id  // 英雄ID": 3,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 204353810,
+        "hero_id  // 英雄ID": 104,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      }
+    ],
+    "building_state  // 建筑状态(位掩码)": 5374170,
+    "weekend_tourney_tournament_id  // 周末联赛ID": 0,
+    "weekend_tourney_division  // 周末联赛分区": 0,
+    "weekend_tourney_skill_level  // 周末联赛技能等级": 0,
+    "weekend_tourney_bracket_round  // 周末联赛淘汰赛轮次": 0,
+    "custom_game_difficulty  // 自定义游戏难度": 0,
+    "is_player_draft  // 是否玩家选人模式": false,
+    "is_watch_eligible  // 是否可观战": true
+  },
+  {
+    "activate_time  // 比赛激活时间": 1768915554,
+    "deactivate_time  // 比赛结束时间": 0,
+    "server_steam_id  // 服务器Steam ID": "90280359056870424",
+    "lobby_id  // 大厅ID": "29671067169285856",
+    "league_id  // 联赛ID": 0,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 0,
+    "game_time  // 当前游戏时间(秒)": 1413,
+    "delay  // 延迟(秒)": 120,
+    "spectators  // 观众数": 227,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 23,
+    "average_mmr  // 平均MMR": 8866,
+    "match_id  // 比赛唯一ID": "8657117092",
+    "series_id  // 系列赛ID": 0,
+    "team_name_radiant  // 天辉战队名": "",
+    "team_name_dire  // 夜魇战队名": "",
+    "team_logo_radiant  // 天辉战队Logo": "0",
+    "team_logo_dire  // 夜魇战队Logo": "0",
+    "team_id_radiant  // 天辉战队ID": 0,
+    "team_id_dire  // 夜魇战队ID": 0,
+    "sort_score  // 排序分数(用于列表排序)": 9449,
+    "last_update_time  // 最后更新时间": 1768917000,
+    "radiant_lead  // 天辉经济领先值": -20571,
+    "radiant_score  // 天辉击杀数": 22,
+    "dire_score  // 夜魇击杀数": 29,
+    "players  // 玩家数据列表": [
+      {
+        "account_id  // Steam账号ID(32位)": 157159646,
+        "hero_id  // 英雄ID": 49,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 330992303,
+        "hero_id  // 英雄ID": 62,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 308126110,
+        "hero_id  // 英雄ID": 76,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 162061878,
+        "hero_id  // 英雄ID": 28,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 208160557,
+        "hero_id  // 英雄ID": 75,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 352087522,
+        "hero_id  // 英雄ID": 114,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 177344451,
+        "hero_id  // 英雄ID": 123,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 104741959,
+        "hero_id  // 英雄ID": 95,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 1228228132,
+        "hero_id  // 英雄ID": 14,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 1009883843,
+        "hero_id  // 英雄ID": 74,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      }
+    ],
+    "building_state  // 建筑状态(位掩码)": 10158242,
+    "weekend_tourney_tournament_id  // 周末联赛ID": 0,
+    "weekend_tourney_division  // 周末联赛分区": 0,
+    "weekend_tourney_skill_level  // 周末联赛技能等级": 0,
+    "weekend_tourney_bracket_round  // 周末联赛淘汰赛轮次": 0,
+    "custom_game_difficulty  // 自定义游戏难度": 0,
+    "is_player_draft  // 是否玩家选人模式": false,
+    "is_watch_eligible  // 是否可观战": true
+  },
+  {
+    "activate_time  // 比赛激活时间": 1768915899,
+    "deactivate_time  // 比赛结束时间": 0,
+    "server_steam_id  // 服务器Steam ID": "90280337260172312",
+    "lobby_id  // 大厅ID": "29671067174337983",
+    "league_id  // 联赛ID": 0,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 0,
+    "game_time  // 当前游戏时间(秒)": 2232,
+    "delay  // 延迟(秒)": 120,
+    "spectators  // 观众数": 239,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 23,
+    "average_mmr  // 平均MMR": 8619,
+    "match_id  // 比赛唯一ID": "8657125222",
+    "series_id  // 系列赛ID": 0,
+    "team_name_radiant  // 天辉战队名": "",
+    "team_name_dire  // 夜魇战队名": "",
+    "team_logo_radiant  // 天辉战队Logo": "0",
+    "team_logo_dire  // 夜魇战队Logo": "0",
+    "team_id_radiant  // 天辉战队ID": 0,
+    "team_id_dire  // 夜魇战队ID": 0,
+    "sort_score  // 排序分数(用于列表排序)": 9341,
+    "last_update_time  // 最后更新时间": 1768918100,
+    "radiant_lead  // 天辉经济领先值": 17369,
+    "radiant_score  // 天辉击杀数": 46,
+    "dire_score  // 夜魇击杀数": 41,
+    "players  // 玩家数据列表": [
+      {
+        "account_id  // Steam账号ID(32位)": 322059767,
+        "hero_id  // 英雄ID": 128,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 876457283,
+        "hero_id  // 英雄ID": 74,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 13959693,
+        "hero_id  // 英雄ID": 34,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 258245283,
+        "hero_id  // 英雄ID": 123,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 120610167,
+        "hero_id  // 英雄ID": 104,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 205904612,
+        "hero_id  // 英雄ID": 32,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 63357584,
+        "hero_id  // 英雄ID": 62,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 54710564,
+        "hero_id  // 英雄ID": 37,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 379473692,
+        "hero_id  // 英雄ID": 64,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 208992602,
+        "hero_id  // 英雄ID": 14,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      }
+    ],
+    "building_state  // 建筑状态(位掩码)": 16449827,
+    "weekend_tourney_tournament_id  // 周末联赛ID": 0,
+    "weekend_tourney_division  // 周末联赛分区": 0,
+    "weekend_tourney_skill_level  // 周末联赛技能等级": 0,
+    "weekend_tourney_bracket_round  // 周末联赛淘汰赛轮次": 0,
+    "custom_game_difficulty  // 自定义游戏难度": 0,
+    "is_player_draft  // 是否玩家选人模式": false,
+    "is_watch_eligible  // 是否可观战": true
+  },
+  {
+    "activate_time  // 比赛激活时间": 1768922330,
+    "deactivate_time  // 比赛结束时间": 0,
+    "server_steam_id  // 服务器Steam ID": "90280361671190547",
+    "lobby_id  // 大厅ID": "29671067271974902",
+    "league_id  // 联赛ID": 0,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 0,
+    "game_time  // 当前游戏时间(秒)": 1182,
+    "delay  // 延迟(秒)": 120,
+    "spectators  // 观众数": 113,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 23,
+    "average_mmr  // 平均MMR": 8408,
+    "match_id  // 比赛唯一ID": "8657276286",
+    "series_id  // 系列赛ID": 0,
+    "team_name_radiant  // 天辉战队名": "",
+    "team_name_dire  // 夜魇战队名": "",
+    "team_logo_radiant  // 天辉战队Logo": "0",
+    "team_logo_dire  // 夜魇战队Logo": "0",
+    "team_id_radiant  // 天辉战队ID": 0,
+    "team_id_dire  // 夜魇战队ID": 0,
+    "sort_score  // 排序分数(用于列表排序)": 8923,
+    "last_update_time  // 最后更新时间": 1768923500,
+    "radiant_lead  // 天辉经济领先值": 32344,
+    "radiant_score  // 天辉击杀数": 37,
+    "dire_score  // 夜魇击杀数": 19,
+    "players  // 玩家数据列表": [
+      {
+        "account_id  // Steam账号ID(32位)": 104741959,
+        "hero_id  // 英雄ID": 93,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 442371406,
+        "hero_id  // 英雄ID": 19,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 125627586,
+        "hero_id  // 英雄ID": 63,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 214233691,
+        "hero_id  // 英雄ID": 83,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 381263686,
+        "hero_id  // 英雄ID": 35,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 0
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 1272544352,
+        "hero_id  // 英雄ID": 92,
+        "team_slot  // 队伍内位置(1-5)": 1,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 101564759,
+        "hero_id  // 英雄ID": 119,
+        "team_slot  // 队伍内位置(1-5)": 2,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 1126837176,
+        "hero_id  // 英雄ID": 8,
+        "team_slot  // 队伍内位置(1-5)": 3,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 150971181,
+        "hero_id  // 英雄ID": 14,
+        "team_slot  // 队伍内位置(1-5)": 4,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      },
+      {
+        "account_id  // Steam账号ID(32位)": 148566416,
+        "hero_id  // 英雄ID": 26,
+        "team_slot  // 队伍内位置(1-5)": 5,
+        "team  // 所属队伍 (0=天辉/1=夜魇)": 1
+      }
+    ],
+    "building_state  // 建筑状态(位掩码)": 33227345,
+    "weekend_tourney_tournament_id  // 周末联赛ID": 0,
+    "weekend_tourney_division  // 周末联赛分区": 0,
+    "weekend_tourney_skill_level  // 周末联赛技能等级": 0,
+    "weekend_tourney_bracket_round  // 周末联赛淘汰赛轮次": 0,
+    "custom_game_difficulty  // 自定义游戏难度": 0,
+    "is_player_draft  // 是否玩家选人模式": false,
+    "is_watch_eligible  // 是否可观战": true
+  }
+]

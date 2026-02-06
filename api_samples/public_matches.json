@@ -1,0 +1,124 @@
+[
+  {
+    "match_id  // 比赛唯一ID": 8657291395,
+    "match_seq_num  // 比赛序列号": 7272170102,
+    "radiant_win  // 天辉是否获胜": false,
+    "start_time  // 开始时间(Unix时间戳)": 1768922904,
+    "duration  // 比赛时长(秒)": 441,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 7,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 22,
+    "avg_rank_tier  // 平均段位": 75,
+    "num_rank_tier  // 有段位的玩家数": 9,
+    "cluster  // 服务器集群ID": 227,
+    "radiant_team  // 天辉队伍英雄ID列表": [
+      44,
+      69,
+      14,
+      40,
+      39
+    ],
+    "dire_team  // 夜魇队伍英雄ID列表": [
+      17,
+      6,
+      43,
+      75,
+      84
+    ]
+  },
+  {
+    "match_id  // 比赛唯一ID": 8657290541,
+    "match_seq_num  // 比赛序列号": 7272167261,
+    "radiant_win  // 天辉是否获胜": false,
+    "start_time  // 开始时间(Unix时间戳)": 1768922863,
+    "duration  // 比赛时长(秒)": 361,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 7,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 22,
+    "avg_rank_tier  // 平均段位": 75,
+    "num_rank_tier  // 有段位的玩家数": 6,
+    "cluster  // 服务器集群ID": 152,
+    "radiant_team  // 天辉队伍英雄ID列表": [
+      74,
+      36,
+      5,
+      70,
+      40
+    ],
+    "dire_team  // 夜魇队伍英雄ID列表": [
+      84,
+      56,
+      26,
+      14,
+      17
+    ]
+  },
+  {
+    "match_id  // 比赛唯一ID": 8657284624,
+    "match_seq_num  // 比赛序列号": 7272161505,
+    "radiant_win  // 天辉是否获胜": true,
+    "start_time  // 开始时间(Unix时间戳)": 1768922588,
+    "duration  // 比赛时长(秒)": 409,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 0,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 23,
+    "avg_rank_tier  // 平均段位": 71,
+    "num_rank_tier  // 有段位的玩家数": 5,
+    "cluster  // 服务器集群ID": 232,
+    "radiant_team  // 天辉队伍英雄ID列表": [
+      19,
+      76,
+      75,
+      43,
+      87
+    ],
+    "dire_team  // 夜魇队伍英雄ID列表": [
+      81,
+      126,
+      74,
+      33,
+      107
+    ]
+  },
+  {
+    "match_id  // 比赛唯一ID": 8657284069,
+    "match_seq_num  // 比赛序列号": 7272162894,
+    "radiant_win  // 天辉是否获胜": false,
+    "start_time  // 开始时间(Unix时间戳)": 1768922567,
+    "duration  // 比赛时长(秒)": 458,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 1,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 21,
+    "avg_rank_tier  // 平均段位": 75,
+    "num_rank_tier  // 有段位的玩家数": 2,
+    "cluster  // 服务器集群ID": 184,
+    "radiant_team  // 天辉队伍英雄ID列表": [
+      65
+    ],
+    "dire_team  // 夜魇队伍英雄ID列表": [
+      21
+    ]
+  },
+  {
+    "match_id  // 比赛唯一ID": 8657281589,
+    "match_seq_num  // 比赛序列号": 7272169453,
+    "radiant_win  // 天辉是否获胜": true,
+    "start_time  // 开始时间(Unix时间戳)": 1768922448,
+    "duration  // 比赛时长(秒)": 962,
+    "lobby_type  // 大厅类型ID (0=普通/7=天梯)": 0,
+    "game_mode  // 游戏模式ID (1=全选/2=队长模式/22=天梯)": 23,
+    "avg_rank_tier  // 平均段位": 72,
+    "num_rank_tier  // 有段位的玩家数": 5,
+    "cluster  // 服务器集群ID": 151,
+    "radiant_team  // 天辉队伍英雄ID列表": [
+      14,
+      6,
+      26,
+      129,
+      35
+    ],
+    "dire_team  // 夜魇队伍英雄ID列表": [
+      110,
+      54,
+      86,
+      83,
+      39
+    ]
+  }
+]

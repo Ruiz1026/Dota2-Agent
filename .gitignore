@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Runtime data / generated outputs
+logs/
+ov_data/
+ward_analysis/
+hero_analysis/
+match_analysis/
+
+# Cached API samples
+api_samples/matches_cache/
+api_call_counts.json
+mcp_config.json

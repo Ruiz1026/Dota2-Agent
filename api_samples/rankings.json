@@ -1,0 +1,905 @@
+{
+  "hero_id  // 英雄ID": 1,
+  "rankings  // 排名列表": [
+    {
+      "account_id  // Steam账号ID(32位)": 202854601,
+      "score  // 分数/评分": 8700.43516529519,
+      "personaname  // Steam昵称": ".tv/subtlesubtlety",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/c4c357162f705eed995c8ac39a78849340890208.jpg",
+      "last_login  // 最后登录时间": "2024-10-01T15:19:34.636Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 194894704,
+      "score  // 分数/评分": 8588.09089842426,
+      "personaname  // Steam昵称": "ckruper",
+      "name  // 内部名称/代号": "ckruper",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/a88b4b3cf94577e268419b90feaa623e67369dd2.jpg",
+      "last_login  // 最后登录时间": "2025-09-15T19:35:33.204Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 61572531,
+      "score  // 分数/评分": 8526.6670403928,
+      "personaname  // Steam昵称": "EXED",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/04f7c75f54301215c608a40fa2cd9d90267526bd.jpg",
+      "last_login  // 最后登录时间": "2019-09-18T22:39:40.390Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 154944191,
+      "score  // 分数/评分": 8524.02372056134,
+      "personaname  // Steam昵称": "Мишенька:3",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/356599f46ea932dc1202bbd94b15d92d4440f280.jpg",
+      "last_login  // 最后登录时间": "2024-06-10T18:57:54.444Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 184629085,
+      "score  // 分数/评分": 8490.34524751759,
+      "personaname  // Steam昵称": "pacesetter",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/b5c40e547730805426a4e243ddddd3b7635a2499.jpg",
+      "last_login  // 最后登录时间": "2026-01-15T08:09:42.422Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 162000708,
+      "score  // 分数/评分": 8482.44145442015,
+      "personaname  // Steam昵称": "безысходность",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/4ee2b8b02c233b6afd2ba19538daf5f3eb9eee10.jpg",
+      "last_login  // 最后登录时间": "2025-08-03T08:23:38.634Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 101071453,
+      "score  // 分数/评分": 8480.32974252032,
+      "personaname  // Steam昵称": "HundredMiles",
+      "name  // 内部名称/代号": "ShineDi",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/06a5613afde8695a66e7556cd37ce272af0fe7b6.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 236747214,
+      "score  // 分数/评分": 8476.40446257092,
+      "personaname  // Steam昵称": "unattainable life",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/9291bf41c0b8189a9431e2bfc0c319e3e4d8fe59.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 26316691,
+      "score  // 分数/评分": 8475.04560728528,
+      "personaname  // Steam昵称": "Hitomi Kuroishi",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/41de0f5b84f0cb3f9616c274d1ffbfc69082d8bb.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 115793260,
+      "score  // 分数/评分": 8450.89961093932,
+      "personaname  // Steam昵称": "hc dif but 0-20 sup oki",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/dcd3080bbd477cf8944d272593384578d3084323.jpg",
+      "last_login  // 最后登录时间": "2024-05-02T02:20:13.532Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 409469394,
+      "score  // 分数/评分": 8442.93184735812,
+      "personaname  // Steam昵称": "ZAPATA",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/b326da7a7ba4f92851f22b70c7918475f5ee5f05.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 111065730,
+      "score  // 分数/评分": 8429.23363848889,
+      "personaname  // Steam昵称": "gamble",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/3cf48d8492ca55602206c1c74426bde81dc84374.jpg",
+      "last_login  // 最后登录时间": "2024-03-24T16:00:56.717Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 250329788,
+      "score  // 分数/评分": 8409.91660940868,
+      "personaname  // Steam昵称": "人生长恨水长东",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/de7aed4299406a52b01b0fc087ec5eb1d380b7e7.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 412413765,
+      "score  // 分数/评分": 8407.34183008697,
+      "personaname  // Steam昵称": "tv/stonebank18",
+      "name  // 内部名称/代号": "StoneBank",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/b682ca62cfc8aef4c1447ebbf9e514d23ba23eab.jpg",
+      "last_login  // 最后登录时间": "2021-03-16T01:16:22.461Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 177629295,
+      "score  // 分数/评分": 8398.25822540926,
+      "personaname  // Steam昵称": "OODODOD",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/93aad3da16ad45997e0e6dddba45f9a20bffab01.jpg",
+      "last_login  // 最后登录时间": "2017-12-24T19:20:52.234Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1029278310,
+      "score  // 分数/评分": 8398.03071935635,
+      "personaname  // Steam昵称": "SWAP COMEND ALL",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/a03f82e9ca6c81f8dfc401ffec6eebdb370eb3c7.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 101062921,
+      "score  // 分数/评分": 8395.92363938624,
+      "personaname  // Steam昵称": "Bad Arminhus",
+      "name  // 内部名称/代号": "Arms",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/d9e129d42fa5b58994c7c1925066f66ee23c5f63.jpg",
+      "last_login  // 最后登录时间": "2016-05-16T17:06:21.329Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 325973787,
+      "score  // 分数/评分": 8394.49991256102,
+      "personaname  // Steam昵称": "Madness",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/219db060266ec5089a21373c4b523e8f55c11d03.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 194964226,
+      "score  // 分数/评分": 8388.93848440247,
+      "personaname  // Steam昵称": "Tallulah",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/5cda06b52b802a110c895b78e159295e7ab9412c.jpg",
+      "last_login  // 最后登录时间": "2022-11-20T21:06:41.495Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 293216275,
+      "score  // 分数/评分": 8388.45649492877,
+      "personaname  // Steam昵称": "MedvedHary",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/34212208eaf6a2c5f0855808d77b4b1d56f7d037.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 186580415,
+      "score  // 分数/评分": 8386.48666880591,
+      "personaname  // Steam昵称": "in the end i'm just as bad",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/9f4ae2b84c7a545b05c14f10b2b1db2bc82f420f.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 302716511,
+      "score  // 分数/评分": 8379.49203024502,
+      "personaname  // Steam昵称": "No Chat",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/5c0c3bf859d9ede9b11613316448fee70fe5bccf.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 139054847,
+      "score  // 分数/评分": 8378.56469869809,
+      "personaname  // Steam昵称": "Supreme",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/9aec4e5f87caca711f2806385cf480066f6f601e.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 351211346,
+      "score  // 分数/评分": 8376.76409087587,
+      "personaname  // Steam昵称": "Mayyas/مياس/Jordan",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/825d37937e6849eca10dcc16c14c6702c8c75527.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 838174509,
+      "score  // 分数/评分": 8376.14483610981,
+      "personaname  // Steam昵称": "时来天地皆同力",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 190623832,
+      "score  // 分数/评分": 8376.12298073263,
+      "personaname  // Steam昵称": "ngu",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/87f058eccea37b636234ee8e648c375745c877d0.jpg",
+      "last_login  // 最后登录时间": "2025-01-19T08:59:42.097Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1212143207,
+      "score  // 分数/评分": 8375.11645611242,
+      "personaname  // Steam昵称": "farm",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/67c0d8b205bd040e31ad47939de16e740ba08994.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1019776103,
+      "score  // 分数/评分": 8368.5315660973,
+      "personaname  // Steam昵称": "illidanmikasa~",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/67ebfe0aba41ed9c55ffec7aec4fb681415c0fad.jpg",
+      "last_login  // 最后登录时间": "2024-09-06T16:17:12.740Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1054222815,
+      "score  // 分数/评分": 8367.35509730463,
+      "personaname  // Steam昵称": "2ez",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/a8872f373f29e0dd25adacf8c9d70e7e0fcfe046.jpg",
+      "last_login  // 最后登录时间": "2022-05-27T14:15:17.301Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 141802781,
+      "score  // 分数/评分": 8365.78888731405,
+      "personaname  // Steam昵称": "halfblood prince",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/f75580b938b74b49f5fff50bd2f2ed6dff066c52.jpg",
+      "last_login  // 最后登录时间": "2022-12-17T20:19:46.883Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 140012532,
+      "score  // 分数/评分": 8363.49749922624,
+      "personaname  // Steam昵称": "Hoshino",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/10361aeb67c59aacecc2ad300a01de60b985154a.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 264813072,
+      "score  // 分数/评分": 8363.23460386531,
+      "personaname  // Steam昵称": "marInn",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/c4d33a662e5116d28c527f1e366ca72288b49c3a.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 329179026,
+      "score  // 分数/评分": 8362.91570665199,
+      "personaname  // Steam昵称": "SWAT",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/fea4263a77d2eb07e971253420e04e18b654fd27.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 142447157,
+      "score  // 分数/评分": 8360.27261922245,
+      "personaname  // Steam昵称": "P",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/1b07f13bb0b71c82e257e6837ef314d72fbc0150.jpg",
+      "last_login  // 最后登录时间": "2023-03-31T00:18:45.389Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 359336566,
+      "score  // 分数/评分": 8358.39083108046,
+      "personaname  // Steam昵称": "panch1ko",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/8227ddc543bd6e9a630c3d22457bb2ad9a0ee488.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 145129370,
+      "score  // 分数/评分": 8357.33832240254,
+      "personaname  // Steam昵称": "🔪",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/781a088c4b89605c828f8dee1a5a048e0c56fa7c.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 488101082,
+      "score  // 分数/评分": 8355.89908510609,
+      "personaname  // Steam昵称": "DD",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 394329624,
+      "score  // 分数/评分": 8352.02965217251,
+      "personaname  // Steam昵称": "Cackoo ^_^",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/04f2357f28656a923310484a03b322c45fd65bfb.jpg",
+      "last_login  // 最后登录时间": "2019-01-13T03:40:18.649Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 169968067,
+      "score  // 分数/评分": 8350.87992850512,
+      "personaname  // Steam昵称": "silence",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/94b4362fd0f086c78c569937e34cb30e57df3984.jpg",
+      "last_login  // 最后登录时间": "2018-09-07T17:43:00.928Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 118670714,
+      "score  // 分数/评分": 8350.87197784666,
+      "personaname  // Steam昵称": "relaxing",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/e8df226ebf02ae3c324e252fb4037b9105505480.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 911444886,
+      "score  // 分数/评分": 8350.73866910614,
+      "personaname  // Steam昵称": "hlsdto",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/8b9a64b11b8152ee4cf701596513d210eecded69.jpg",
+      "last_login  // 最后登录时间": "2024-02-28T21:03:51.936Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 171268416,
+      "score  // 分数/评分": 8350.44308491387,
+      "personaname  // Steam昵称": "negative mental attitude",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/47a874e2956dae04064b375fdd6fe0df378be7df.jpg",
+      "last_login  // 最后登录时间": "2022-04-11T10:27:33.717Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 210668373,
+      "score  // 分数/评分": 8348.95518395387,
+      "personaname  // Steam昵称": "ooops",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/454b5a26ccf8510fabc0abf25aa04b9455f101d3.jpg",
+      "last_login  // 最后登录时间": "2022-10-29T08:59:01.661Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 857668070,
+      "score  // 分数/评分": 8346.79030262351,
+      "personaname  // Steam昵称": "Bruisin",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/fede1355e88a5ffae6e9bfc20de4ec33a18ef5d1.jpg",
+      "last_login  // 最后登录时间": "2021-03-06T12:29:48.787Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 297782733,
+      "score  // 分数/评分": 8342.17813775187,
+      "personaname  // Steam昵称": "Memories",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb.jpg",
+      "last_login  // 最后登录时间": "2024-04-04T21:38:04.183Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 157989498,
+      "score  // 分数/评分": 8341.60218921889,
+      "personaname  // Steam昵称": "Chalise",
+      "name  // 内部名称/代号": "Scofield",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/914e5d2ca87960f19416af5316f7718208eb7091.jpg",
+      "last_login  // 最后登录时间": "2018-09-10T01:48:12.778Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 396553336,
+      "score  // 分数/评分": 8338.60056684887,
+      "personaname  // Steam昵称": "Суперпихарь 64",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/8e26b72eccc19c71032f506280ad3b7a9b426891.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 74
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 308856459,
+      "score  // 分数/评分": 8335.2177953042,
+      "personaname  // Steam昵称": "Кузя Сисичкин",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/0a63420275c64d5938f4acadbc4f8ffa339851bb.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 226450539,
+      "score  // 分数/评分": 8332.56112977511,
+      "personaname  // Steam昵称": "герой (4)",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/783ac1f1d590300cf600db68aee5aa761701e051.jpg",
+      "last_login  // 最后登录时间": "2025-03-11T17:10:43.114Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1016984528,
+      "score  // 分数/评分": 8328.88877984125,
+      "personaname  // Steam昵称": "1/afk",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/34adcd2a2c63e40ce323f872f4781ef5ee322413.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 110583422,
+      "score  // 分数/评分": 8328.71494280969,
+      "personaname  // Steam昵称": "SAMSON",
+      "name  // 内部名称/代号": "Samson",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/d3ddf2e6187e492669e166ea55a9b4c95f10d365.jpg",
+      "last_login  // 最后登录时间": "2024-11-03T01:35:36.241Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 215008013,
+      "score  // 分数/评分": 8328.71254890602,
+      "personaname  // Steam昵称": "BRB :')",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/6e73f6cdd83593989ec6e9d87b219b3225fa2f01.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 414065025,
+      "score  // 分数/评分": 8328.54170237902,
+      "personaname  // Steam昵称": ".hyhy",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/2eb98fd5d8dbddf8818a68870bb8286b522712d9.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 289887816,
+      "score  // 分数/评分": 8327.67391882517,
+      "personaname  // Steam昵称": "tv/AsakuraTwins",
+      "name  // 内部名称/代号": "tv/AsakuraTwins",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/bb8b604e17b3ed494278e4bc2978ecc08da4ad81.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 178652346,
+      "score  // 分数/评分": 8327.3095986196,
+      "personaname  // Steam昵称": "барабиджон",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/e3ffa9f36c4e3c5d1d58a05dcc16f2ae2c26db64.jpg",
+      "last_login  // 最后登录时间": "2021-07-17T20:41:28.419Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 260241404,
+      "score  // 分数/评分": 8326.44203502734,
+      "personaname  // Steam昵称": "Beginner",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/3ed459adda21cfdbf7ab04edcd722289f48f763d.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 195966181,
+      "score  // 分数/评分": 8326.00095772346,
+      "personaname  // Steam昵称": "RIOT",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/408fa5f4aa2011080a86aef18f69395a3b2a661d.jpg",
+      "last_login  // 最后登录时间": "2024-11-17T08:00:37.566Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 863034388,
+      "score  // 分数/评分": 8324.43436407285,
+      "personaname  // Steam昵称": "國神jETt",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/bdeb0bce5e409cc074fa4276abc0c30168771be4.jpg",
+      "last_login  // 最后登录时间": "2024-10-24T01:31:05.409Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 878021633,
+      "score  // 分数/评分": 8322.82933849886,
+      "personaname  // Steam昵称": "egoista",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/f128deb29415b05853573567990695742ce04aea.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 355619071,
+      "score  // 分数/评分": 8320.00336365536,
+      "personaname  // Steam昵称": "剑心犹在",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/67d942d610895dc7613b50a07da165de5eb732ba.jpg",
+      "last_login  // 最后登录时间": "2020-04-12T14:01:06.210Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 925407683,
+      "score  // 分数/评分": 8319.45601842184,
+      "personaname  // Steam昵称": "sippin` lean",
+      "name  // 内部名称/代号": "Licht 神",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/5a4226d8cd33418a88af5847cfa19fb9a8e2f08c.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 182597785,
+      "score  // 分数/评分": 8318.4694871476,
+      "personaname  // Steam昵称": ".MUTANT",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/c9b00e1726fc93e3b4a7ede809c96d9681ef4603.jpg",
+      "last_login  // 最后登录时间": "2025-03-21T17:30:27.270Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 170467864,
+      "score  // 分数/评分": 8315.45702691719,
+      "personaname  // Steam昵称": "Emilia tan",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/cf3c77f13f160b0c40f2544e52dd4b843549072b.jpg",
+      "last_login  // 最后登录时间": "2020-05-18T18:27:17.845Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 168914530,
+      "score  // 分数/评分": 8312.27639318584,
+      "personaname  // Steam昵称": "你要我就来",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1674739115,
+      "score  // 分数/评分": 8311.80468136098,
+      "personaname  // Steam昵称": "Варешка",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/4bdb63d5a77f49d14feebf8bfa6b7469c2e5ded2.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 313825023,
+      "score  // 分数/评分": 8311.63556615182,
+      "personaname  // Steam昵称": "Ame",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/206c3cfc3653a7c2e8ccfae9551873efa6abd9c2.jpg",
+      "last_login  // 最后登录时间": "2018-09-04T20:08:20.657Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 843885616,
+      "score  // 分数/评分": 8310.17265595161,
+      "personaname  // Steam昵称": "kil0what",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/0f2851f3058f2cac97272958b82ba3f7489dbeb4.jpg",
+      "last_login  // 最后登录时间": "2025-05-05T07:51:13.522Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 95868247,
+      "score  // 分数/评分": 8309.67271663235,
+      "personaname  // Steam昵称": "yakumo",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/f945613a2b6b239c4f7643c1d2b149cc262270af.jpg",
+      "last_login  // 最后登录时间": "2026-01-01T23:30:52.448Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 73
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 841501097,
+      "score  // 分数/评分": 8309.01250988978,
+      "personaname  // Steam昵称": "xdxc",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/b1709c1398825c70a91e207f707f5aa83ac9999e.jpg",
+      "last_login  // 最后登录时间": "2025-02-20T23:01:28.913Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 393891255,
+      "score  // 分数/评分": 8308.94631911971,
+      "personaname  // Steam昵称": "oturan絕對",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/3ae59c0b63ed7af4ba95b6c01cb0778768a80c9d.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 226647043,
+      "score  // 分数/评分": 8308.26258388704,
+      "personaname  // Steam昵称": "s3xonsafelane",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/3b01d142a10b0ebfa92083762e068c3a293dbd2a.jpg",
+      "last_login  // 最后登录时间": "2018-06-14T23:46:05.107Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 126476299,
+      "score  // 分数/评分": 8306.57586970799,
+      "personaname  // Steam昵称": "Sam",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/f8b40b6a81912ccda11067aac717267efc2a14b0.jpg",
+      "last_login  // 最后登录时间": "2018-06-28T05:05:36.705Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 96183976,
+      "score  // 分数/评分": 8304.96877110371,
+      "personaname  // Steam昵称": "1nonly",
+      "name  // 内部名称/代号": "TA2000",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/f6c05ad5faef6c7ca82d665c6a2fbc66dbf9857c.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 459244509,
+      "score  // 分数/评分": 8304.83608189069,
+      "personaname  // Steam昵称": "Mariana4",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/8702c51f5663a5436456403de9c80e87c25bd2aa.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 172099728,
+      "score  // 分数/评分": 8302.7537989133,
+      "personaname  // Steam昵称": "EfficiencY-",
+      "name  // 内部名称/代号": "Kiritych~",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/ef9a5e9193b7c382f4aec22b73d96aa44cde6665.jpg",
+      "last_login  // 最后登录时间": "2024-10-02T10:49:41.243Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 123024247,
+      "score  // 分数/评分": 8302.73946049713,
+      "personaname  // Steam昵称": "Rot~Lok",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/f491c9c4a2a6f157714acd6dee0a7cf79e54e06d.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 875292579,
+      "score  // 分数/评分": 8302.40714484271,
+      "personaname  // Steam昵称": "unplayable lanes every day",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/8e855364b13411e1e5ef517c239f90be6f2cfe20.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 203851397,
+      "score  // 分数/评分": 8300.20312508495,
+      "personaname  // Steam昵称": "ghostblade",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/7562a756a8bb9c6152436a00d351682293ed19f1.jpg",
+      "last_login  // 最后登录时间": "2024-02-20T18:52:19.873Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 344100973,
+      "score  // 分数/评分": 8300.07539390411,
+      "personaname  // Steam昵称": "европа фм",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/e95c27b69c329c245983395cc771b317a969fb7b.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1144747827,
+      "score  // 分数/评分": 8300.04544262457,
+      "personaname  // Steam昵称": "Eternal pain",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/bf37cb92e4deccb512df8469140b281cb56ca656.jpg",
+      "last_login  // 最后登录时间": "2023-01-03T03:19:42.157Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 103162342,
+      "score  // 分数/评分": 8300.02297849043,
+      "personaname  // Steam昵称": "Cartoons & Cereal",
+      "name  // 内部名称/代号": "islA",
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/e47e8100b9152319c1218f4528b9e8aa1fbb874e.jpg",
+      "last_login  // 最后登录时间": "2020-03-25T13:33:54.973Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1280293698,
+      "score  // 分数/评分": 8299.53311547537,
+      "personaname  // Steam昵称": "Royalripper",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/d3f25483727d110949a7d8388efe62385ad076fb.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 98379515,
+      "score  // 分数/评分": 8297.39823587202,
+      "personaname  // Steam昵称": "AVARICE",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/3d5970860b5c456d9656137c4b1e97d10f40400c.jpg",
+      "last_login  // 最后登录时间": "2019-04-09T23:41:43.350Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 172227533,
+      "score  // 分数/评分": 8294.35605777222,
+      "personaname  // Steam昵称": "Make Out Hill",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/16b38603c3ce3f5b8a18c03e26d0e597a803ce2d.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 419083421,
+      "score  // 分数/评分": 8294.22057325844,
+      "personaname  // Steam昵称": "burger",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/46e66894eb53af23ab681d448569959d49a84deb.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 418178893,
+      "score  // 分数/评分": 8294.1150080564,
+      "personaname  // Steam昵称": "`",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/ea4c50ea1fde0e0a5df6db2115d34339b956c264.jpg",
+      "last_login  // 最后登录时间": "2025-09-21T11:23:42.767Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 407698877,
+      "score  // 分数/评分": 8293.51416744548,
+      "personaname  // Steam昵称": "Глетчер",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/0ae23647fb307f514bb87948409107097242bc8a.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 237527926,
+      "score  // 分数/评分": 8292.53354340259,
+      "personaname  // Steam昵称": "Сальери",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/80df8f0cf909cb94d27947db5f532cea8fb4916a.jpg",
+      "last_login  // 最后登录时间": "2021-11-29T00:05:07.584Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 141116496,
+      "score  // 分数/评分": 8289.47906622536,
+      "personaname  // Steam昵称": "igor",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/38a3c4ed8eb1bfe15e40213bb2b26fc17c6fc83f.jpg",
+      "last_login  // 最后登录时间": "2022-06-07T02:19:04.405Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 192882023,
+      "score  // 分数/评分": 8288.79613749387,
+      "personaname  // Steam昵称": "SiCho",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/fa8fe77a915474ac8969f5d94effc7fbfde7a2e4.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 317147142,
+      "score  // 分数/评分": 8288.79428642401,
+      "personaname  // Steam昵称": "extra class games",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/3c98247e225a5500362c9c0632bd7c34559ad33c.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 156155016,
+      "score  // 分数/评分": 8286.64434501653,
+      "personaname  // Steam昵称": "gt3",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/0cf3441bbd75f12e280f8552ac898bdf4c481595.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 243060684,
+      "score  // 分数/评分": 8286.50270939267,
+      "personaname  // Steam昵称": "CORRIDA",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/27cd63e6de2a53672eb70db27bc1a461906911fe.jpg",
+      "last_login  // 最后登录时间": "2025-12-11T23:01:33.050Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 375793581,
+      "score  // 分数/评分": 8286.499648168,
+      "personaname  // Steam昵称": "abysswalker",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/eec932d005038b29d3aab5162db10a463e39437b.jpg",
+      "last_login  // 最后登录时间": "2024-08-25T18:30:49.637Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 176135170,
+      "score  // 分数/评分": 8286.49081131677,
+      "personaname  // Steam昵称": "/",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/6fca838189e716eda18003f1d5a0969e792e7d3b.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 199390891,
+      "score  // 分数/评分": 8285.78730658941,
+      "personaname  // Steam昵称": "Fallen",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/85e13252d9565d633e7201375f0a945b8af68fad.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 115719286,
+      "score  // 分数/评分": 8285.69031245258,
+      "personaname  // Steam昵称": "Humanity",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/3c21cf143a366c59cedf6617ba1cd75c4cd00f05.jpg",
+      "last_login  // 最后登录时间": "2023-06-25T19:36:51.211Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 1016676974,
+      "score  // 分数/评分": 8285.60539464692,
+      "personaname  // Steam昵称": "taeyeon",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/83ad380bf7e16966d0415d93b4dc59089af96bb8.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 217642019,
+      "score  // 分数/评分": 8285.42000380344,
+      "personaname  // Steam昵称": "0_o",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/7fc118d2fc0f41446c80f4e4a1f1a0ec34cfac38.jpg",
+      "last_login  // 最后登录时间": null,
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    },
+    {
+      "account_id  // Steam账号ID(32位)": 318113214,
+      "score  // 分数/评分": 8282.36047113732,
+      "personaname  // Steam昵称": "silence",
+      "name  // 内部名称/代号": null,
+      "avatar  // 头像URL(小)": "https://avatars.steamstatic.com/2883c9d3f25ac88c26b524506452a852362d160f.jpg",
+      "last_login  // 最后登录时间": "2025-08-20T20:24:57.816Z",
+      "rank_tier  // 段位等级 (11-85, 十位=勋章 个位=星数)": 80
+    }
+  ]
+}
