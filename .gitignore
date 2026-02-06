@@ -4,6 +4,7 @@ __pycache__/
 
 # Environment
 .env
+ov.conf
 
 # Runtime data / generated outputs
 logs/
