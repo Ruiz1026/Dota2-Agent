@@ -20,3 +20,9 @@ mcp_config.json
 
 # Local utils tests (not required for runtime)
 utils/test_*.py
+
+# Local utils scripts/data not required for runtime
+utils/resize_maps.py
+utils/crop_maps.py
+utils/check_player_matches.py
+utils/stratz_api_response.json
