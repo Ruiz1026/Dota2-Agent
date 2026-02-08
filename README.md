@@ -39,6 +39,28 @@ SERPAPI_API_KEY=your_serpapi_key
    - 如需自定义路径，可设置 OPENVIKING_CONFIG_FILE 指向配置文件
    - 运行后自动生成 ov_data/
 
+   ov.conf example (replace api_key):
+
+```json
+{
+  "embedding": {
+    "dense": {
+      "api_base": "https://ark.cn-beijing.volces.com/api/v3",
+      "api_key": "your_api_key",
+      "provider": "volcengine",
+      "dimension": 1024,
+      "model": "doubao-embedding-vision-250615"
+    }
+  },
+  "vlm": {
+    "api_base": "https://ark.cn-beijing.volces.com/api/v3",
+    "api_key": "your_api_key",
+    "provider": "volcengine",
+    "model": "doubao-seed-1-8-251228"
+  }
+}
+```
+
 5. 启动 Web 服务
 
 ```bash
