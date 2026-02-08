@@ -127,7 +127,7 @@
       display: flex;
       flex-direction: column;
       gap: 18px;
-      max-width: 980px;
+      max-width: 1240px;
       margin: 0 auto;
     }
     .chat-wrapper {
@@ -239,7 +239,7 @@
       display: flex;
       gap: 12px;
       align-items: flex-start;
-      max-width: 1160px;
+      max-width: 1240px;
       animation: messageIn 0.3s ease;
     }
     .message.no-animate {
@@ -644,15 +644,17 @@
 
     function parseTable(lines, startIndex) {
       const headerLine = lines[startIndex];
-      let separatorIndex = startIndex + 1;
-      while (separatorIndex < lines.length && !lines[separatorIndex].trim()) {
-        separatorIndex += 1;
-      }
-      const separatorLine = lines[separatorIndex];
-      if (separatorLine === undefined) return null;
-      if (!/^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/.test(separatorLine)) {
-        return null;
-      }
+
+      const isPipeLine = (line) => {
+        if (!line || !line.includes('|')) return false;
+        const trimmed = line.trim();
+        if (!trimmed) return false;
+        const raw = trimmed.startsWith('|') ? trimmed.slice(1) : trimmed;
+        const rawTail = raw.endsWith('|') ? raw.slice(0, -1) : raw;
+        const cells = rawTail.split('|').map((cell) => cell.trim());
+        const nonEmpty = cells.filter((cell) => cell.length > 0);
+        return cells.length >= 2 && nonEmpty.length > 0;
+      };
 
       const readCells = (line) => {
         const trimmed = line.trim();
@@ -661,9 +663,65 @@
         return rawTail.split('|').map((cell) => renderInline(cell.trim()));
       };
 
+      const normalizeRow = (cells, width) => {
+        if (cells.length >= width) return cells;
+        return cells.concat(new Array(width - cells.length).fill(''));
+      };
+
+      let separatorIndex = startIndex + 1;
+      while (separatorIndex < lines.length && !lines[separatorIndex].trim()) {
+        separatorIndex += 1;
+      }
+      const separatorLine = lines[separatorIndex];
+      const hasSeparator = separatorLine !== undefined
+        && /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/.test(separatorLine);
+
+      if (hasSeparator) {
+        const headerCells = readCells(headerLine);
+        let index = separatorIndex + 1;
+        const bodyRows = [];
+        let width = headerCells.length;
+        while (index < lines.length) {
+          const line = lines[index];
+          if (!line.trim()) {
+            let peek = index + 1;
+            while (peek < lines.length && !lines[peek].trim()) {
+              peek += 1;
+            }
+            if (peek >= lines.length || !lines[peek].includes('|')) {
+              break;
+            }
+            index = peek;
+            continue;
+          }
+          if (!line.includes('|')) break;
+          const rowCells = readCells(line);
+          width = Math.max(width, rowCells.length);
+          bodyRows.push(rowCells);
+          index += 1;
+        }
+
+        const headerHtml = `<tr>${normalizeRow(headerCells, width).map((cell) => `<th>${cell}</th>`).join('')}</tr>`;
+        const bodyHtml = bodyRows
+          .map((row) => `<tr>${normalizeRow(row, width).map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+          .join('');
+        const tableHtml = `<table><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
+
+        return { html: tableHtml, nextIndex: index };
+      }
+
+      // Fallback: tolerate missing separator line if there are consecutive pipe rows
+      if (!isPipeLine(headerLine)) return null;
+      let index = startIndex + 1;
+      while (index < lines.length && !lines[index].trim()) {
+        index += 1;
+      }
+      if (index >= lines.length || !isPipeLine(lines[index])) return null;
+
       const headerCells = readCells(headerLine);
-      let index = separatorIndex + 1;
       const bodyRows = [];
+      let width = headerCells.length;
+
       while (index < lines.length) {
         const line = lines[index];
         if (!line.trim()) {
@@ -671,20 +729,24 @@
           while (peek < lines.length && !lines[peek].trim()) {
             peek += 1;
           }
-          if (peek >= lines.length || !lines[peek].includes('|')) {
+          if (peek >= lines.length || !isPipeLine(lines[peek])) {
             break;
           }
           index = peek;
           continue;
         }
-        if (!line.includes('|')) break;
-        bodyRows.push(readCells(line));
+        if (!isPipeLine(line)) break;
+        const rowCells = readCells(line);
+        width = Math.max(width, rowCells.length);
+        bodyRows.push(rowCells);
         index += 1;
       }
 
-      const headerHtml = `<tr>${headerCells.map((cell) => `<th>${cell}</th>`).join('')}</tr>`;
+      if (width < 2 || bodyRows.length === 0) return null;
+
+      const headerHtml = `<tr>${normalizeRow(headerCells, width).map((cell) => `<th>${cell}</th>`).join('')}</tr>`;
       const bodyHtml = bodyRows
-        .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+        .map((row) => `<tr>${normalizeRow(row, width).map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
         .join('');
       const tableHtml = `<table><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table>`;
 
@@ -816,7 +878,7 @@
       if (lines.some((line) => /^\s{0,3}#{1,6}\s+/.test(line))) {
         return true;
       }
-      if (lines.some((line) => /^\s*([-*]|\d+\.)\s+/.test(line))) {
+      if (lines.some((line) => /^\s{0,3}([-*]|\d+\.)\s+/.test(line))) {
         return true;
       }
       if (lines.some((line) => SECTION_HEADINGS.has(line.trim()) || /^新英雄[:：]/.test(line.trim()))) {
@@ -894,19 +956,23 @@
           continue;
         }
 
-        const listMatch = line.match(/^(\d+\.|[-*])\s+(.*)$/);
+        const listMatch = line.match(/^\s{0,3}(\d+\.|[-*])\s+(.*)$/);
         if (listMatch) {
           const isOrdered = /\d+\./.test(listMatch[1]);
           const tag = isOrdered ? 'ol' : 'ul';
+          const startNumber = isOrdered ? Number.parseInt(listMatch[1], 10) : null;
+          const startAttr = isOrdered && Number.isFinite(startNumber) && startNumber > 1
+            ? ` start="${startNumber}"`
+            : '';
           const items = [];
           while (i < lines.length) {
             const current = lines[i];
-            const currentMatch = current.match(/^(\d+\.|[-*])\s+(.*)$/);
+            const currentMatch = current.match(/^\s{0,3}(\d+\.|[-*])\s+(.*)$/);
             if (!currentMatch) break;
             items.push(`<li>${renderInline(currentMatch[2].trim())}</li>`);
             i += 1;
           }
-          output.push(`<${tag}>${items.join('')}</${tag}>`);
+          output.push(`<${tag}${startAttr}>${items.join('')}</${tag}>`);
           continue;
         }
 
@@ -915,7 +981,7 @@
           const candidate = lines[i];
           const isBlockStart = candidate.startsWith('```')
             || /^(#{1,4})\s+/.test(candidate)
-            || /^(\d+\.|[-*])\s+/.test(candidate)
+            || /^\s{0,3}(\d+\.|[-*])\s+/.test(candidate)
             || !!parseTable(lines, i);
           if (isBlockStart) {
             if (paragraphLines.length === 0) {

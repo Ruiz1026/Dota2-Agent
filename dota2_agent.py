@@ -116,7 +116,7 @@ class Dota2ReActAgent:
         # LLM 配置
         self.llm_api_key = llm_api_key or os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY")
         self.llm_base_url = llm_base_url or os.getenv("OPENAI_BASE_URL") or os.getenv("LLM_BASE_URL")
-        self.llm_model = llm_model or os.getenv("LLM_MODEL_ID") or "deepseek-v3.2"
+        self.llm_model = llm_model or os.getenv("LLM_MODEL_ID") or "deepseek-chat"
         self.llm_timeout = float(os.getenv("LLM_TIMEOUT", llm_timeout))
         self.max_observation_chars = int(os.getenv("MAX_OBSERVATION_CHARS", max_observation_chars))
         
@@ -607,6 +607,28 @@ class Dota2ReActAgent:
         
         return response
 
+    def _sanitize_final_answer(self, answer: str) -> str:
+        if not answer:
+            return answer
+        # Replace HTML line breaks to keep markdown clean and avoid tags in replies
+        cleaned = re.sub(r"\s*<br\s*/?>\s*", " / ", answer, flags=re.IGNORECASE)
+        # Remove horizontal rules (but keep markdown table separators that include pipes)
+        cleaned = re.sub(r"(?m)^[ \t]*-{3,}[ \t]*$", "", cleaned)
+        cleaned = re.sub(r"(?m)^[ \t:]*-{3,}[ \t:]*$", "", cleaned)
+        # Remove blockquote markers to avoid styled highlight
+        cleaned = re.sub(r"(?m)^[ \t]*>\s?", "", cleaned)
+        # Remove inline code markers to avoid unintended highlighting
+        cleaned = re.sub(r"`([^`]+)`", r"\1", cleaned)
+        cleaned = cleaned.replace("`", "")
+        # Remove emphasis markers that may render as highlighted text
+        cleaned = cleaned.replace("**", "")
+        cleaned = cleaned.replace("__", "")
+        cleaned = re.sub(r"(?<!\S)\*([^*\n]+)\*", r"\1", cleaned)
+        cleaned = re.sub(r"(?<!\S)_([^_\n]+)_", r"\1", cleaned)
+        # Collapse extra blank lines introduced by removals
+        cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+        return cleaned.strip()
+
     def _trim_observation_for_llm(self, observation: str) -> str:
         if not observation:
             return observation
@@ -624,7 +646,8 @@ class Dota2ReActAgent:
         """解析最终答案"""
         match = re.search(r'Final Answer:\s*(.*)', response, re.DOTALL)
         if match:
-            return match.group(1).strip()
+            answer = match.group(1).strip()
+            return self._sanitize_final_answer(answer)
         return None
 
     def _extract_thought(self, response: str) -> Optional[str]:
@@ -644,28 +667,11 @@ class Dota2ReActAgent:
         self._pending_visual_markdown = []
 
     def _maybe_capture_visual_report(self, tool_name: str, observation: str) -> None:
-        if tool_name != "save_match_details_report":
-            return
-        marker_line = ""
-        lines = observation.splitlines()
-        marker_index = None
-        for idx, line in enumerate(lines):
-            if "Markdown" in line and line.strip().startswith("##"):
-                marker_line = line.strip()
-                marker_index = idx
-                break
-        if marker_index is None:
-            return
-        report_body = "\n".join(lines[marker_index + 1:]).strip()
-        if not report_body:
-            return
-        report_markdown = f"{marker_line}\n{report_body}".strip()
-        if report_markdown not in self._pending_visual_markdown:
-            self._pending_visual_markdown.append(report_markdown)
+        return
 
     def _append_visual_reports(self, final_answer: str) -> Tuple[str, str]:
         if not self._pending_visual_markdown:
-            return final_answer, ""
+            return self._sanitize_final_answer(final_answer), ""
         appended: List[str] = []
         for report in self._pending_visual_markdown:
             report_text = (report or "").strip()
@@ -679,11 +685,13 @@ class Dota2ReActAgent:
             appended.append(report_text)
         if not appended:
             self._pending_visual_markdown = []
-            return final_answer, ""
+            return self._sanitize_final_answer(final_answer), ""
         separator = "\n\n" if final_answer.strip() else ""
         appended_text = separator + "\n\n".join(appended)
+        appended_text = self._sanitize_final_answer(appended_text)
         self._pending_visual_markdown = []
-        return f"{final_answer}{appended_text}", appended_text
+        combined = f"{self._sanitize_final_answer(final_answer)}{appended_text}"
+        return combined, appended_text
     
     async def run(self, user_input: str) -> str:
         """

@@ -30,11 +30,16 @@ pip install -r requirements.txt
 ```bash
 LLM_API_KEY=your_api_key
 LLM_BASE_URL=https://api.deepseek.com/v1
-LLM_MODEL_ID=deepseek-v3.2
+LLM_MODEL_ID=deepseek-chat
 SERPAPI_API_KEY=your_serpapi_key
 ```
 
-4. 启动 Web 服务
+4. 配置 OpenViking（可选，默认启用记忆）
+   - 编辑 ov.conf，填入你的 embedding / VLM 供应商与 API Key
+   - 如需自定义路径，可设置 OPENVIKING_CONFIG_FILE 指向配置文件
+   - 运行后自动生成 ov_data/
+
+5. 启动 Web 服务
 
 ```bash
 python web_app.py

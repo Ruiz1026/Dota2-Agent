@@ -366,8 +366,6 @@ Action Input: {"team_name": "OG"}
 - 必须先调用 `get_team_matches` 获取最近比赛，且至少覆盖 20 场
 - 必须调用 get_match_details；分析时必须覆盖 Observation 中所有比赛的全部信息（双方阵容、KDA、经济、伤害、推塔等），并包含装备信息（item_0~item_5 / Items 列），不得遗漏任何场次或字段
 - 必须调用 `get_team_heroes`，并将其返回信息完整展示
-- 必须调用 `save_team_hero_report` 保存分析结果，并在对话中展示其返回的 Markdown 可视化内容
-- 必须调用 `save_match_details_report` 保存多场比赛详情可视化，并在对话中展示其返回的 Markdown 可视化内容
 - 在对话里至少展示最近 10 场比赛的详情（每场包含对手、结果、时长、阵容与核心数据表）
 - 近期战绩概览表必须追加“本队英雄”字段，列出该场使用的5名英雄
 - 若近期比赛不足或数据缺失，需明确提示“样本不足/数据不全”，不得编造
@@ -442,7 +440,7 @@ Final Answer:
 ## 回答要求
 1. 使用中文回答
 2. 英雄名称使用中文
-3. 数据使用表格展示
+3. 对传入的数据总结时，尽量使用表格（Markdown 或 HTML）展示
 4. 提供专业的分析见解
 5. 时长转换为 分:秒 格式
 6. 眼位分析需输出报告，并写入网页可视化
@@ -1208,7 +1206,6 @@ DOTA2_MCP_TOOLS = [
         }
     },
     {
-        "name": "save_team_hero_report",
         "description": "保存战队常用英雄分析报告（返回HTML路径与Markdown可视化）",
         "inputSchema": {
             "type": "object",
@@ -1238,7 +1235,6 @@ DOTA2_MCP_TOOLS = [
         }
     },
     {
-        "name": "save_match_details_report",
         "description": "保存多场比赛详情分析报告（返回HTML路径与Markdown可视化）",
         "inputSchema": {
             "type": "object",
