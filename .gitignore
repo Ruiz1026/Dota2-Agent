@@ -17,3 +17,6 @@ match_analysis/
 api_samples/matches_cache/
 api_call_counts.json
 mcp_config.json
+
+# Local utils tests (not required for runtime)
+utils/test_*.py
