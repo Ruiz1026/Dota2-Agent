@@ -1,4 +1,4 @@
-# dota2_fastmcp.py
+﻿# dota2_fastmcp.py
 """
 Dota 2 MCP Server - FastMCP 版本
 使用 FastMCP 简化 MCP Server 的实现
@@ -153,6 +153,17 @@ HERO_CN_NAMES = {
     "Void Spirit": "虚无之灵", "Snapfire": "电炎绝手", "Mars": "玛尔斯",
     "Dawnbreaker": "破晓辰星", "Marci": "玛西", "Primal Beast": "獸",
     "Muerta": "琼英碧灵", "Ringmaster": "百戏大王", "Kez": "凯", "Largo": "郎戈",
+}
+
+RANK_TIER_MAP: Dict[int, Tuple[str, str]] = {
+    1: ("Herald", "先锋"),
+    2: ("Guardian", "卫士"),
+    3: ("Crusader", "中军"),
+    4: ("Archon", "统帅"),
+    5: ("Legend", "传奇"),
+    6: ("Ancient", "万古"),
+    7: ("Divine", "超凡"),
+    8: ("Immortal", "冠绝"),
 }
 
 
@@ -388,6 +399,47 @@ def _build_item_entry(item_id: Any, item_map: Dict[int, Dict[str, str]]) -> Opti
 def _get_cn_name(en_name: str) -> str:
     """获取英雄中文名"""
     return HERO_CN_NAMES.get(en_name, en_name)
+
+
+def _format_rank_tier(rank_tier: Any) -> Optional[str]:
+    if rank_tier is None:
+        return None
+    try:
+        rank_float = float(rank_tier)
+        rank_int = int(round(rank_float))
+    except (TypeError, ValueError):
+        return str(rank_tier)
+    if rank_int <= 0:
+        return None
+    tier = rank_int // 10
+    star = rank_int % 10
+    if tier >= 8:
+        en, cn = RANK_TIER_MAP.get(8, ("Immortal", "冠绝"))
+        return f"{en}（{cn}）"
+    entry = RANK_TIER_MAP.get(tier)
+    if not entry:
+        return str(rank_tier)
+    en, cn = entry
+    if star <= 0:
+        return f"{en}（{cn}）"
+    return f"{en} {star}（{cn}{star}星）"
+
+
+def _format_rank_bin(bin_name: Any, bin_id: Any = None) -> str:
+    if bin_id is not None:
+        try:
+            bin_int = int(bin_id)
+        except (TypeError, ValueError):
+            bin_int = None
+        if bin_int in RANK_TIER_MAP:
+            en, cn = RANK_TIER_MAP[bin_int]
+            return f"{en}（{cn}）"
+    name_str = str(bin_name) if bin_name is not None else "N/A"
+    for en, cn in RANK_TIER_MAP.values():
+        if en.lower() in name_str.lower():
+            return f"{en}（{cn}）"
+    return name_str
+
 
 
 def _normalize_text(text: str) -> str:
@@ -2272,79 +2324,127 @@ class WardAnalyzer:
 @mcp.tool()
 def get_match_details(match_id: int) -> str:
     """
-    获取 Dota 2 比赛原始数据（matches/{match_id}）
-    
+    获取 Dota 2 比赛信息摘要（matches/{match_id}）
+
     Args:
         match_id: Dota 2 比赛ID，例如 8650430843
-    
+
     Returns:
-        比赛摘要 + 原始数据 JSON（与 matches/{match_id} 响应字段一致）
+        比赛摘要 + 双方阵容/数据概览（不包含原始 JSON）
     """
     data = _make_request(f"matches/{match_id}")
-    
+
     if isinstance(data, dict) and "error" in data:
         return f"❌ API 错误: {data['error']}"
 
     if not isinstance(data, dict):
         return "❌ 获取比赛详情失败"
 
-    fields = [
-        "match_id",
-        "barracks_status_dire",
-        "barracks_status_radiant",
-        "chat",
-        "cluster",
-        "cosmetics",
-        "dire_score",
-        "draft_timings",
-        "duration",
-        "engine",
-        "first_blood_time",
-        "game_mode",
-        "human_players",
-        "leagueid",
-        "lobby_type",
-        "match_seq_num",
-        "negative_votes",
-        "objectives",
-        "picks_bans",
-        "positive_votes",
-        "radiant_gold_adv",
-        "radiant_score",
-        "radiant_win",
-        "radiant_xp_adv",
-        "start_time",
-        "teamfights",
-        "tower_status_dire",
-        "tower_status_radiant",
-        "version",
-        "replay_salt",
-        "series_id",
-        "series_type",
-        "radiant_team",
-        "dire_team",
-        "league",
-        "skill",
-        "players",
-        "patch",
-        "region",
-        "all_word_counts",
-        "my_word_counts",
-        "throw",
-        "comeback",
-        "loss",
-        "win",
-        "replay_url",
-        "pauses",
-    ]
-
-    payload = {field: data.get(field) for field in fields}
-
     hero_map = _build_hero_map()
     item_map = _load_items_map()
-    duration = int(payload.get("duration") or 0)
+
+    def _count_bits(value: Any) -> Optional[int]:
+        try:
+            return bin(int(value)).count("1")
+        except (TypeError, ValueError):
+            return None
+
+    def _format_items_from_ids(item_ids: List[Any]) -> str:
+        names: List[str] = []
+        for item_id in item_ids:
+            entry = _build_item_entry(item_id, item_map)
+            if entry:
+                item_name = entry.get("name") or str(entry.get("id"))
+            else:
+                item_name = "-"
+            names.append(str(item_name))
+        return " / ".join(names)
+
+    def _format_items(p: Dict[str, Any]) -> str:
+        return _format_items_from_ids([p.get(f"item_{slot}") for slot in range(6)])
+
+    def _format_backpack(p: Dict[str, Any]) -> str:
+        backpack_ids = [p.get(f"backpack_{slot}") for slot in range(3)]
+        if not any(backpack_ids):
+            return "-"
+        return _format_items_from_ids(backpack_ids)
+
+    def _format_neutral(p: Dict[str, Any]) -> str:
+        neutral_id = p.get("item_neutral") if p.get("item_neutral") is not None else p.get("item_neutral_id")
+        if neutral_id is None:
+            return "-"
+        entry = _build_item_entry(neutral_id, item_map)
+        if entry:
+            return str(entry.get("name") or entry.get("id"))
+        return str(neutral_id)
+
+    def _lookup_const_name(resource: str, key: Any) -> str:
+        if key is None:
+            return "N/A"
+        data, _, _, _ = _load_constants_resource(resource)
+        key_str = str(key)
+        if isinstance(data, dict):
+            entry = data.get(key_str)
+            if entry is None:
+                try:
+                    entry = data.get(int(key))
+                except (TypeError, ValueError):
+                    entry = None
+            if isinstance(entry, dict):
+                for field in ("name", "localized_name", "desc", "date"):
+                    if entry.get(field):
+                        return str(entry.get(field))
+                if entry.get("id") is not None:
+                    return str(entry.get("id"))
+            if isinstance(entry, str):
+                return entry
+        if isinstance(data, list):
+            for item in data:
+                if not isinstance(item, dict):
+                    continue
+                if str(item.get("id")) == key_str or str(item.get("patch")) == key_str:
+                    for field in ("name", "localized_name", "desc", "date"):
+                        if item.get(field):
+                            return str(item.get(field))
+        return str(key)
+
+    def _skill_display(value: Any) -> str:
+        mapping = {1: "Normal", 2: "High", 3: "Very High"}
+        try:
+            value_int = int(value)
+        except (TypeError, ValueError):
+            return "N/A" if value is None else str(value)
+        return mapping.get(value_int, str(value_int))
+
+    def _series_display(value: Any) -> str:
+        mapping = {0: "Single Game", 1: "Bo1", 2: "Bo3", 3: "Bo5"}
+        try:
+            value_int = int(value)
+        except (TypeError, ValueError):
+            return "N/A" if value is None else str(value)
+        return mapping.get(value_int, str(value_int))
+
+    def _sum_int(players: List[Dict[str, Any]], field: str) -> int:
+        total = 0
+        for p in players:
+            try:
+                total += int(p.get(field) or 0)
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def _sum_float(players: List[Dict[str, Any]], field: str) -> float:
+        total = 0.0
+        for p in players:
+            try:
+                total += float(p.get(field) or 0)
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    duration = int(data.get("duration") or 0)
     minutes, seconds = divmod(duration, 60)
-    radiant_win = payload.get("radiant_win")
+    radiant_win = data.get("radiant_win")
     if radiant_win is True:
         winner = "天辉 (Radiant)"
     elif radiant_win is False:
@@ -2352,79 +2452,198 @@ def get_match_details(match_id: int) -> str:
     else:
         winner = "未知"
 
+    start_time = data.get("start_time")
+    start_time_str = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime(int(start_time))) if start_time else "N/A"
+    first_blood_time = data.get("first_blood_time")
+    first_blood_str = _format_time_mmss(int(first_blood_time)) if first_blood_time is not None else "N/A"
+
+    game_mode = data.get("game_mode")
+    lobby_type = data.get("lobby_type")
+    region = data.get("region")
+    patch = data.get("patch")
+    skill = data.get("skill")
+
+    game_mode_name = _lookup_const_name("game_mode", game_mode)
+    lobby_name = _lookup_const_name("lobby_type", lobby_type)
+    region_name = _lookup_const_name("region", region)
+    patch_name = _lookup_const_name("patch", patch)
+
+    radiant_team = data.get("radiant_team") or {}
+    dire_team = data.get("dire_team") or {}
+    league = data.get("league") or {}
+
+    tower_radiant = data.get("tower_status_radiant")
+    tower_dire = data.get("tower_status_dire")
+    barracks_radiant = data.get("barracks_status_radiant")
+    barracks_dire = data.get("barracks_status_dire")
+
+    tower_radiant_alive = _count_bits(tower_radiant)
+    tower_dire_alive = _count_bits(tower_dire)
+    barracks_radiant_alive = _count_bits(barracks_radiant)
+    barracks_dire_alive = _count_bits(barracks_dire)
+
     lines = [
-        f"# 比赛详情 - Match ID: {payload.get('match_id')}",
+        f"# 比赛详情 - Match ID: {data.get('match_id')}",
         "",
         "## 基本信息",
-        f"- 🏆 获胜方: {winner}",
-        f"- ⏱️ 时长: {minutes}分{seconds}秒",
-        f"- 📊 比分: 天辉 {payload.get('radiant_score', 0)} - {payload.get('dire_score', 0)} 夜魇",
-        "",
+        f"- 时间: {start_time_str}",
+        f"- 时长: {minutes}分{seconds}秒 ({duration}s)",
+        f"- 获胜方: {winner}",
+        f"- 比分: 天辉 {data.get('radiant_score', 0)} - {data.get('dire_score', 0)} 夜魇",
+        f"- 首杀时间: {first_blood_str}",
+        f"- 模式: {game_mode_name} ({game_mode})",
+        f"- 房间: {lobby_name} ({lobby_type})",
+        f"- 地区: {region_name} ({region})",
+        f"- 段位: {_skill_display(skill)}",
+        f"- 联赛: {league.get('name') or data.get('leagueid', 'N/A')} (ID: {data.get('leagueid', 'N/A')})",
+        f"- 系列赛: {_series_display(data.get('series_type'))} (series_id: {data.get('series_id', 'N/A')})",
+        f"- Patch: {patch_name} ({patch})",
+        f"- Cluster: {data.get('cluster', 'N/A')}",
+        f"- 人类玩家数: {data.get('human_players', 'N/A')}",
     ]
 
-    players = payload.get("players") or []
+    if data.get("replay_url"):
+        lines.append(f"- 回放: {data.get('replay_url')}")
+
+    if radiant_team or dire_team:
+        lines.append("")
+        lines.append("## 队伍信息")
+        if radiant_team:
+            lines.append(f"- 天辉: {radiant_team.get('name', 'Unknown')} (ID: {radiant_team.get('team_id', 'N/A')})")
+        if dire_team:
+            lines.append(f"- 夜魇: {dire_team.get('name', 'Unknown')} (ID: {dire_team.get('team_id', 'N/A')})")
+
+    if tower_radiant is not None or tower_dire is not None:
+        lines.append("")
+        lines.append("## 建筑状态")
+        if tower_radiant is not None or tower_dire is not None:
+            tr = f"{tower_radiant_alive}/11" if tower_radiant_alive is not None else "N/A"
+            td = f"{tower_dire_alive}/11" if tower_dire_alive is not None else "N/A"
+            lines.append(f"- 防御塔剩余: 天辉 {tr} (mask {tower_radiant}) / 夜魇 {td} (mask {tower_dire})")
+        if barracks_radiant is not None or barracks_dire is not None:
+            br = f"{barracks_radiant_alive}/6" if barracks_radiant_alive is not None else "N/A"
+            bd = f"{barracks_dire_alive}/6" if barracks_dire_alive is not None else "N/A"
+            lines.append(f"- 兵营剩余: 天辉 {br} (mask {barracks_radiant}) / 夜魇 {bd} (mask {barracks_dire})")
+
+    gold_adv = data.get("radiant_gold_adv") or []
+    xp_adv = data.get("radiant_xp_adv") or []
+    if gold_adv or xp_adv:
+        lines.append("")
+        lines.append("## 经济/经验走势")
+        if gold_adv:
+            lines.append(
+                f"- 经济优势(天辉视角): 最佳 {max(gold_adv)}, 最差 {min(gold_adv)}, 终局 {gold_adv[-1]}"
+            )
+        if xp_adv:
+            lines.append(
+                f"- 经验优势(天辉视角): 最佳 {max(xp_adv)}, 最差 {min(xp_adv)}, 终局 {xp_adv[-1]}"
+            )
+
+    players = data.get("players") or []
     if players:
-        # 天辉方
-        lines.append("## 🟢 天辉方 (Radiant)")
-        lines.append("| 英雄 | 选手 | 选手ID | K/D/A | GPM | XPM | 经济 | 英雄伤害 | 塔伤 | 装备 |")
-        lines.append("|------|------|--------|-------|-----|-----|------|----------|------|------|")
-        for p in players:
-            if p.get("isRadiant", p.get("player_slot", 128) < 128):
+        def _is_radiant(p: Dict[str, Any]) -> bool:
+            if p.get("isRadiant") is not None:
+                return bool(p.get("isRadiant"))
+            return p.get("player_slot", 128) < 128
+
+        radiant_players = [p for p in players if _is_radiant(p)]
+        dire_players = [p for p in players if not _is_radiant(p)]
+
+        def _team_summary(title: str, team_players: List[Dict[str, Any]]) -> List[str]:
+            if not team_players:
+                return []
+            kills = _sum_int(team_players, "kills")
+            deaths = _sum_int(team_players, "deaths")
+            assists = _sum_int(team_players, "assists")
+            net_worth = _sum_int(team_players, "net_worth")
+            hero_damage = _sum_int(team_players, "hero_damage")
+            tower_damage = _sum_int(team_players, "tower_damage")
+            hero_healing = _sum_int(team_players, "hero_healing")
+            gpm = _sum_int(team_players, "gold_per_min")
+            xpm = _sum_int(team_players, "xp_per_min")
+            last_hits = _sum_int(team_players, "last_hits")
+            denies = _sum_int(team_players, "denies")
+            obs = _sum_int(team_players, "obs_placed")
+            sen = _sum_int(team_players, "sen_placed")
+            stuns = _sum_float(team_players, "stuns")
+            return [
+                f"- {title}: K/D/A={kills}/{deaths}/{assists}, 净资产={net_worth}, GPM={gpm}, XPM={xpm}, LH/DN={last_hits}/{denies}",
+                f"  伤害(英雄/塔/治疗)={hero_damage}/{tower_damage}/{hero_healing}, 视野(真/假)={obs}/{sen}, 控制时长={stuns:.1f}s",
+            ]
+
+        lines.append("")
+        lines.append("## 阵营总览")
+        lines.extend(_team_summary("天辉", radiant_players))
+        lines.extend(_team_summary("夜魇", dire_players))
+
+        def _append_player_table(title: str, team_players: List[Dict[str, Any]]) -> None:
+            if not team_players:
+                return
+            lines.append("")
+            lines.append(title)
+            lines.append("| 英雄 | 选手 | 选手ID | K/D/A | 等级 | LH/DN | GPM/XPM | 净资产 | 伤害(英雄/塔/治疗) | 视野(真/假) | 位置 | 装备 | 背包 | 中立 |")
+            lines.append("|------|------|--------|-------|------|------|---------|-------|------------------|-----------|------|------|------|------|")
+            for p in team_players:
                 hero_en = hero_map.get(p.get("hero_id"), f"Hero {p.get('hero_id')}")
                 hero_cn = _get_cn_name(hero_en)
                 player_name = p.get("name") or p.get("personaname") or "Unknown"
                 player_id = p.get("account_id") if p.get("account_id") is not None else "Unknown"
                 kda = f"{p.get('kills', 0)}/{p.get('deaths', 0)}/{p.get('assists', 0)}"
-                item_names: List[str] = []
-                for slot in range(6):
-                    item_entry = _build_item_entry(p.get(f"item_{slot}"), item_map)
-                    if item_entry:
-                        item_name = item_entry.get("name") or str(item_entry.get("id"))
-                    else:
-                        item_name = "-"
-                    item_names.append(str(item_name))
-                items_display = " / ".join(item_names)
+                level = p.get("level", 0)
+                lh_dn = f"{p.get('last_hits', 0)}/{p.get('denies', 0)}"
+                gpm_xpm = f"{p.get('gold_per_min', 0)}/{p.get('xp_per_min', 0)}"
+                net_worth = p.get("net_worth", 0)
+                damage_block = f"{p.get('hero_damage', 0)}/{p.get('tower_damage', 0)}/{p.get('hero_healing', 0)}"
+                wards_block = f"{p.get('obs_placed', 0)}/{p.get('sen_placed', 0)}"
+                lane = p.get("lane")
+                lane_role = p.get("lane_role")
+                lane_display = "-"
+                if lane is not None or lane_role is not None:
+                    lane_display = f"{lane if lane is not None else '-'} / {lane_role if lane_role is not None else '-'}"
+                items_display = _format_items(p)
+                backpack_display = _format_backpack(p)
+                neutral_display = _format_neutral(p)
                 lines.append(
-                    f"| {hero_cn} | {player_name} | {player_id} | {kda} | {p.get('gold_per_min', 0)} | "
-                    f"{p.get('xp_per_min', 0)} | {p.get('net_worth', 0)} | "
-                    f"{p.get('hero_damage', 0)} | {p.get('tower_damage', 0)} | {items_display} |"
+                    f"| {hero_cn} | {player_name} | {player_id} | {kda} | {level} | {lh_dn} | {gpm_xpm} | {net_worth} | "
+                    f"{damage_block} | {wards_block} | {lane_display} | {items_display} | {backpack_display} | {neutral_display} |"
                 )
 
-        # 夜魇方
-        lines.append("")
-        lines.append("## 🔴 夜魇方 (Dire)")
-        lines.append("| 英雄 | 选手 | 选手ID | K/D/A | GPM | XPM | 经济 | 英雄伤害 | 塔伤 | 装备 |")
-        lines.append("|------|------|--------|-------|-----|-----|------|----------|------|------|")
-        for p in players:
-            if not p.get("isRadiant", p.get("player_slot", 0) < 128):
-                hero_en = hero_map.get(p.get("hero_id"), f"Hero {p.get('hero_id')}")
-                hero_cn = _get_cn_name(hero_en)
-                player_name = p.get("name") or p.get("personaname") or "Unknown"
-                player_id = p.get("account_id") if p.get("account_id") is not None else "Unknown"
-                kda = f"{p.get('kills', 0)}/{p.get('deaths', 0)}/{p.get('assists', 0)}"
-                item_names: List[str] = []
-                for slot in range(6):
-                    item_entry = _build_item_entry(p.get(f"item_{slot}"), item_map)
-                    if item_entry:
-                        item_name = item_entry.get("name") or str(item_entry.get("id"))
-                    else:
-                        item_name = "-"
-                    item_names.append(str(item_name))
-                items_display = " / ".join(item_names)
-                lines.append(
-                    f"| {hero_cn} | {player_name} | {player_id} | {kda} | {p.get('gold_per_min', 0)} | "
-                    f"{p.get('xp_per_min', 0)} | {p.get('net_worth', 0)} | "
-                    f"{p.get('hero_damage', 0)} | {p.get('tower_damage', 0)} | {items_display} |"
-                )
-        lines.append("")
+        _append_player_table("## 🟦 天辉阵容 (Radiant)", radiant_players)
+        _append_player_table("## 🟥 夜魇阵容 (Dire)", dire_players)
 
-    lines.append("## 原始数据 (JSON)")
-    lines.append("```json")
-    lines.append(json.dumps(payload, ensure_ascii=False, indent=2))
-    lines.append("```")
+    picks_bans = data.get("picks_bans") or []
+    if picks_bans:
+        lines.append("")
+        lines.append("## BP 阶段")
+        lines.append("| 顺序 | 选择 | 阵营 | 英雄 |")
+        lines.append("|------|------|------|------|")
+        for entry in picks_bans:
+            hero_id = entry.get("hero_id")
+            hero_en = hero_map.get(hero_id, f"Hero {hero_id}")
+            hero_cn = _get_cn_name(hero_en)
+            is_pick = entry.get("is_pick")
+            pick_label = "Pick" if is_pick else "Ban"
+            team_val = entry.get("team")
+            if team_val == 0:
+                team_label = "天辉"
+            elif team_val == 1:
+                team_label = "夜魇"
+            else:
+                team_label = str(team_val)
+            lines.append(f"| {entry.get('order', '-')} | {pick_label} | {team_label} | {hero_cn} |")
+
+    objectives = data.get("objectives") or []
+    if objectives:
+        lines.append("")
+        lines.append("## 关键事件统计")
+        counts: Dict[str, int] = {}
+        for obj in objectives:
+            obj_type = obj.get("type") or "unknown"
+            counts[obj_type] = counts.get(obj_type, 0) + 1
+        sorted_counts = sorted(counts.items(), key=lambda x: (-x[1], x[0]))
+        lines.append(", ".join([f"{k}: {v}" for k, v in sorted_counts[:15]]))
+
     return "\n".join(lines)
-
-
 @mcp.tool()
 def get_match_items(match_id: int) -> str:
     """
@@ -2930,8 +3149,13 @@ def get_player_info(account_id: int) -> str:
         f"- 账号 ID: {profile.get('account_id', 'N/A')}",
     ]
     
-    if data.get("rank_tier"):
-        lines.append(f"- 天梯段位: {data.get('rank_tier')}")
+    if data.get("rank_tier") is not None:
+        rank_tier = data.get("rank_tier")
+        rank_text = _format_rank_tier(rank_tier)
+        if rank_text:
+            lines.append(f"- 天梯段位: {rank_text}（{rank_tier}）")
+        else:
+            lines.append(f"- 天梯段位: {rank_tier}")
     
     if data.get("leaderboard_rank"):
         lines.append(f"- 排行榜排名: {data.get('leaderboard_rank')}")
@@ -3350,13 +3574,15 @@ def get_public_matches(min_rank: int = 70, limit: int = 20) -> str:
     for m in matches:
         match_id = m.get("match_id", "N/A")
         rank = m.get("avg_rank_tier", "N/A")
+        rank_text = _format_rank_tier(rank) if rank not in ("N/A", None, "") else None
+        rank_display = f"{rank_text}（{rank}）" if rank_text else str(rank)
         duration = m.get("duration", 0)
         minutes = duration // 60
         
         radiant = m.get("radiant_team", "")
         dire = m.get("dire_team", "")
         
-        lines.append(f"| {match_id} | {rank} | {minutes}分 | {radiant[:20]} | {dire[:20]} |")
+        lines.append(f"| {match_id} | {rank_display} | {minutes}分 | {radiant[:20]} | {dire[:20]} |")
     
     return "\n".join(lines)
 
@@ -3879,10 +4105,12 @@ def get_mmr_distribution() -> str:
     
     for r in rows[:20]:
         bin_name = r.get("bin_name", "N/A")
+        bin_id = r.get("bin")
+        bin_display = _format_rank_bin(bin_name, bin_id)
         count = r.get("count", 0)
         cum_sum = r.get("cumulative_sum", 0)
         
-        lines.append(f"| {bin_name} | {count:,} | {cum_sum:.2f}% |")
+        lines.append(f"| {bin_display} | {count:,} | {cum_sum:.2f}% |")
     
     return "\n".join(lines)
 
@@ -6945,3 +7173,4 @@ def get_live_matches(limit: int = 10) -> str:
 
 if __name__ == "__main__":
     mcp.run()
+
