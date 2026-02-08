@@ -261,13 +261,13 @@
       max-width: 100%;
     }
     .avatar {
-      width: 56px;
-      height: 56px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 10px;
       line-height: 1.1;
       font-weight: 600;
       text-transform: uppercase;
@@ -278,8 +278,14 @@
       overflow: hidden;
     }
     .avatar.user {
+      width: 48px;
+      height: 48px;
+      font-size: 16px;
       background: #f5f5f5;
       color: #111;
+    }
+    .avatar.assistant {
+      font-size: 16px;
     }
     .bubble {
       max-width: 980px;
@@ -638,7 +644,11 @@
 
     function parseTable(lines, startIndex) {
       const headerLine = lines[startIndex];
-      const separatorLine = lines[startIndex + 1];
+      let separatorIndex = startIndex + 1;
+      while (separatorIndex < lines.length && !lines[separatorIndex].trim()) {
+        separatorIndex += 1;
+      }
+      const separatorLine = lines[separatorIndex];
       if (separatorLine === undefined) return null;
       if (!/^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/.test(separatorLine)) {
         return null;
@@ -652,11 +662,21 @@
       };
 
       const headerCells = readCells(headerLine);
-      let index = startIndex + 2;
+      let index = separatorIndex + 1;
       const bodyRows = [];
       while (index < lines.length) {
         const line = lines[index];
-        if (!line.trim()) break;
+        if (!line.trim()) {
+          let peek = index + 1;
+          while (peek < lines.length && !lines[peek].trim()) {
+            peek += 1;
+          }
+          if (peek >= lines.length || !lines[peek].includes('|')) {
+            break;
+          }
+          index = peek;
+          continue;
+        }
         if (!line.includes('|')) break;
         bodyRows.push(readCells(line));
         index += 1;
@@ -892,10 +912,23 @@
 
         const paragraphLines = [];
         while (i < lines.length && lines[i].trim()) {
-          paragraphLines.push(renderInline(lines[i].trim()));
+          const candidate = lines[i];
+          const isBlockStart = candidate.startsWith('```')
+            || /^(#{1,4})\s+/.test(candidate)
+            || /^(\d+\.|[-*])\s+/.test(candidate)
+            || !!parseTable(lines, i);
+          if (isBlockStart) {
+            if (paragraphLines.length === 0) {
+              break;
+            }
+            break;
+          }
+          paragraphLines.push(renderInline(candidate.trim()));
           i += 1;
         }
-        output.push(`<p>${paragraphLines.join('<br>')}</p>`);
+        if (paragraphLines.length > 0) {
+          output.push(`<p>${paragraphLines.join('<br>')}</p>`);
+        }
       }
 
       return output.join('');
@@ -907,7 +940,7 @@
 
       const avatar = document.createElement('div');
       avatar.className = `avatar ${role}`;
-      avatar.textContent = role === 'assistant' ? 'Agent' : '用户';
+      avatar.textContent = role === 'assistant' ? 'AI' : '用户';
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
@@ -1345,10 +1378,24 @@
     function createTyper(target, speed = 18) {
       let queue = '';
       let timer = null;
+      const idleCallbacks = [];
+
+      const notifyIdle = () => {
+        if (!queue && !timer) {
+          idleCallbacks.forEach((cb) => {
+            try {
+              cb();
+            } catch (err) {
+              console.error('Typer idle callback error', err);
+            }
+          });
+        }
+      };
 
       const step = () => {
         if (!queue) {
           timer = null;
+          notifyIdle();
           return;
         }
         target.textContent += queue[0];
@@ -1371,6 +1418,7 @@
           timer = null;
         }
         target.textContent = '';
+        notifyIdle();
       };
 
       const flush = () => {
@@ -1382,9 +1430,17 @@
           clearTimeout(timer);
           timer = null;
         }
+        notifyIdle();
       };
 
-      return { enqueue, clear, flush };
+      const isBusy = () => !!timer || queue.length > 0;
+      const onIdle = (cb) => {
+        if (typeof cb === 'function') {
+          idleCallbacks.push(cb);
+        }
+      };
+
+      return { enqueue, clear, flush, isBusy, onIdle };
     }
 
     function autoResize() {
@@ -1420,6 +1476,7 @@
         sessionId: null,
         conversationRef: null,
         finalBuffer: '',
+        pendingFinal: '',
         wardHtml: '',
         userInput: message,
         status: 'running',
@@ -1429,6 +1486,19 @@
         detached: false,
         useTyper: true,
       };
+      const streamRef = currentStream;
+      statusTyper.onIdle(() => {
+        if (!streamRef || streamRef.detached) {
+          return;
+        }
+        if (streamRef.pendingFinal) {
+          finalTyper.enqueue(streamRef.pendingFinal);
+          streamRef.pendingFinal = '';
+        }
+        if (streamRef.ui && streamRef.detached === false && !streamRef.useTyper) {
+          streamRef.ui.finalText.innerHTML = renderMarkdown(streamRef.finalBuffer || '');
+        }
+      });
       startHistoryPolling();
 
       if (useNewSession) {
@@ -1549,11 +1619,18 @@
                   currentStream.conversationRef.final_answer = currentStream.finalBuffer;
                 }
               }
+              const shouldDelayFinal = statusTyper.isBusy();
               if (!currentStream || (!currentStream.detached && currentStream.useTyper)) {
-                finalTyper.enqueue(payload.content || '');
+                if (shouldDelayFinal && currentStream) {
+                  currentStream.pendingFinal += payload.content || '';
+                } else {
+                  finalTyper.enqueue(payload.content || '');
+                }
               }
               if (currentStream && currentStream.ui && currentStream.detached === false && !currentStream.useTyper) {
-                currentStream.ui.finalText.innerHTML = renderMarkdown(currentStream.finalBuffer || '');
+                if (!shouldDelayFinal) {
+                  currentStream.ui.finalText.innerHTML = renderMarkdown(currentStream.finalBuffer || '');
+                }
               }
             } else if (payload.type === 'final') {
               statusTyper.clear();
@@ -1561,6 +1638,9 @@
               thinking.classList.add('hidden');
               typing.classList.add('hidden');
               finalTyper.flush();
+              if (currentStream) {
+                currentStream.pendingFinal = '';
+              }
               const finalContent = payload.content || (currentStream ? currentStream.finalBuffer : '');
               finalText.innerHTML = renderMarkdown(finalContent || '');
               if (payload.ward_html) {

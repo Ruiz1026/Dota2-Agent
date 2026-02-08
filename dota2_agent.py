@@ -8,7 +8,7 @@ import os
 import re
 import json
 import asyncio
-from typing import Optional, Dict, Any, List, AsyncGenerator
+from typing import Optional, Dict, Any, List, AsyncGenerator, Tuple
 from dotenv import load_dotenv
 
 # 加载环境变量
@@ -151,6 +151,7 @@ class Dota2ReActAgent:
         self._memory_last_query = ""
         self._memory_last_context = ""
         self._last_user_input = ""
+        self._pending_visual_markdown: List[str] = []
         self._last_assistant_answer = ""
         self._recent_turns: List[Dict[str, str]] = []
         self._background_tasks: set = set()
@@ -598,11 +599,10 @@ class Dota2ReActAgent:
         # 查找 Action Input 的位置
         input_match = re.search(r'Action Input:\s*\{[^}]*\}', response, re.DOTALL)
         if input_match:
-            # 检查 Action Input 后面是否有 Observation（LLM 自己生成的）
+            # 规范化：Action Input 后不允许继续输出
             after_input = response[input_match.end():]
-            if re.search(r'Observation:', after_input, re.IGNORECASE):
-                # LLM 自己生成了 Observation，截断它
-                print("⚠️ 检测到 LLM 自己生成了 Observation，已移除")
+            if after_input.strip():
+                print("⚠️ 检测到 Action Input 后继续输出，已截断")
                 return response[:input_match.end()]
         
         return response
@@ -639,6 +639,51 @@ class Dota2ReActAgent:
         if match:
             return "/" + match.group(1).replace("\\", "/")
         return None
+
+    def _reset_visual_reports(self) -> None:
+        self._pending_visual_markdown = []
+
+    def _maybe_capture_visual_report(self, tool_name: str, observation: str) -> None:
+        if tool_name != "save_match_details_report":
+            return
+        marker_line = ""
+        lines = observation.splitlines()
+        marker_index = None
+        for idx, line in enumerate(lines):
+            if "Markdown" in line and line.strip().startswith("##"):
+                marker_line = line.strip()
+                marker_index = idx
+                break
+        if marker_index is None:
+            return
+        report_body = "\n".join(lines[marker_index + 1:]).strip()
+        if not report_body:
+            return
+        report_markdown = f"{marker_line}\n{report_body}".strip()
+        if report_markdown not in self._pending_visual_markdown:
+            self._pending_visual_markdown.append(report_markdown)
+
+    def _append_visual_reports(self, final_answer: str) -> Tuple[str, str]:
+        if not self._pending_visual_markdown:
+            return final_answer, ""
+        appended: List[str] = []
+        for report in self._pending_visual_markdown:
+            report_text = (report or "").strip()
+            if not report_text:
+                continue
+            if report_text in final_answer:
+                continue
+            first_line = next((line for line in report_text.splitlines() if line.strip()), "")
+            if first_line and first_line in final_answer:
+                continue
+            appended.append(report_text)
+        if not appended:
+            self._pending_visual_markdown = []
+            return final_answer, ""
+        separator = "\n\n" if final_answer.strip() else ""
+        appended_text = separator + "\n\n".join(appended)
+        self._pending_visual_markdown = []
+        return f"{final_answer}{appended_text}", appended_text
     
     async def run(self, user_input: str) -> str:
         """
@@ -661,6 +706,8 @@ class Dota2ReActAgent:
             memory_context = await self._retrieve_memory_context(memory_query)
         if memory_ready and len(user_input.strip()) >= self.memory_record_user_min_chars:
             await self._record_memory_message("user", user_input)
+
+        self._reset_visual_reports()
 
         # 开始记录对话
         if self.logger:
@@ -713,6 +760,7 @@ class Dota2ReActAgent:
                 # 检查是否有最终答案
                 final_answer = self._parse_final_answer(response)
                 if final_answer:
+                    final_answer, _ = self._append_visual_reports(final_answer)
                     # 记录最后一次迭代
                     if self.logger:
                         self.logger.log_iteration(i + 1, response)
@@ -740,6 +788,7 @@ class Dota2ReActAgent:
                         observation = f"工具调用错误: {str(e)}"
                     
                     print(f"\n📋 Observation:\n{observation[:500]}...")
+                    self._maybe_capture_visual_report(tool_name, observation)
                     
                     # 记录迭代
                     if self.logger:
@@ -801,6 +850,8 @@ class Dota2ReActAgent:
         if memory_ready and len(user_input.strip()) >= self.memory_record_user_min_chars:
             await self._record_memory_message("user", user_input)
 
+        self._reset_visual_reports()
+
         if self.logger:
             self.logger.start_conversation(user_input, self.llm_model)
             if self.logger.current_conversation:
@@ -830,23 +881,9 @@ class Dota2ReActAgent:
                 print("\n⏳ 正在请求 LLM...")
                 try:
                     response = ""
-                    final_stream_start: Optional[int] = None
-                    final_sent_chars = 0
 
                     async for chunk in self._call_llm_stream(messages):
                         response += chunk
-                        if final_stream_start is None:
-                            match = re.search(r"Final Answer:\s*", response)
-                            if match:
-                                final_stream_start = match.end()
-
-                        if final_stream_start is not None:
-                            final_text = response[final_stream_start:]
-                            if len(final_text) > final_sent_chars:
-                                delta = final_text[final_sent_chars:]
-                                final_sent_chars = len(final_text)
-                                if delta:
-                                    yield {"type": "final_delta", "content": delta}
                 except asyncio.TimeoutError:
                     result = f"LLM 请求超时（>{self.llm_timeout:.0f}s），请稍后重试。"
                     if self.logger:
@@ -888,6 +925,9 @@ class Dota2ReActAgent:
 
                 final_answer = self._parse_final_answer(response)
                 if final_answer:
+                    final_answer, appended_text = self._append_visual_reports(final_answer)
+                    if appended_text:
+                        yield {"type": "final_delta", "content": appended_text}
                     if self.logger:
                         self.logger.log_iteration(i + 1, response)
                         self.logger.end_conversation(final_answer, "success")
@@ -918,6 +958,7 @@ class Dota2ReActAgent:
                         ward_html = self._extract_ward_html_path(observation) or ward_html
 
                     print(f"\n📋 Observation:\n{observation[:500]}...")
+                    self._maybe_capture_visual_report(tool_name, observation)
 
                     yield {"type": "observation", "content": observation}
 

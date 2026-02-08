@@ -56,6 +56,7 @@ pip install mcp requests openai python-dotenv
 LLM_API_KEY=your_api_key
 LLM_BASE_URL=https://api.openai.com/v1
 LLM_MODEL=gpt-4
+SERPAPI_API_KEY=your_serpapi_key
 ```
 
 ### 3. 运行
@@ -109,6 +110,7 @@ Final Answer:
 | `get_pro_matches` | 获取职业比赛 | `limit?` |
 | `get_player_win_loss` | 获取胜负统计 | `account_id` |
 | `get_player_heroes` | 获取常用英雄 | `account_id`, `limit?` |
+| `search_dota_history` | SerpApi 搜索 Dota 历史信息 | `query`, `num_results?`, `include_liquipedia?`, `sites?`（默认多站点） |
 | `analyze_multi_match_wards` | 多场比赛眼位/击杀/推塔汇总与热力图 | `team_id?`, `account_id?`, `match_ids?`, `limit?(默认10)` |
 | `inject_multi_match_ward_report_html` | 写入多场比赛汇总分析报告并读取汇总JSON | `summary_path?`, `report_html?`, `report_path?`, `html_path?` |
 

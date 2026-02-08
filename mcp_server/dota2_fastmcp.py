@@ -9,6 +9,7 @@ import re
 import json
 import base64
 import html
+from html.parser import HTMLParser
 import requests
 import time
 from io import BytesIO
@@ -27,6 +28,7 @@ from PIL import Image
 import math
 
 from mcp.server.fastmcp import FastMCP
+from dotenv import load_dotenv
 
 try:
     import cv2
@@ -47,6 +49,10 @@ plt.rcParams['axes.unicode_minus'] = False
 # ==================== 创建 FastMCP Server ====================
 
 mcp = FastMCP("Dota2 Assistant")
+
+# 读取 .env（用于 SerpApi 等第三方配置）
+_ENV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv(_ENV_PATH, override=False)
 
 # ==================== 配置 ====================
 
@@ -87,6 +93,9 @@ CONSTANT_RESOURCES = [
     "skillshots",
     "xp_level",
 ]
+
+# SerpApi 搜索
+SERPAPI_ENDPOINT = "https://serpapi.com/search.json"
 
 # 眼位分析输出目录
 WARD_OUTPUT_DIR = "ward_analysis"
@@ -169,6 +178,103 @@ def _make_post_request(endpoint: str, payload: Optional[Dict] = None) -> Dict[st
         return response.json()
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
+
+
+def _truncate_text(text: str, max_len: int = 160) -> str:
+    if not text:
+        return ""
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 3] + "..."
+
+
+class _HTMLTextExtractor(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self._chunks: List[str] = []
+        self._skip_depth = 0
+        self._block_tags = {
+            "p", "br", "div", "li", "tr", "section", "article",
+            "header", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "pre",
+        }
+        self._skip_tags = {"script", "style", "noscript"}
+
+    def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]) -> None:
+        if tag in self._skip_tags:
+            self._skip_depth += 1
+            return
+        if tag in self._block_tags:
+            self._chunks.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in self._skip_tags:
+            if self._skip_depth > 0:
+                self._skip_depth -= 1
+            return
+        if tag in self._block_tags:
+            self._chunks.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if self._skip_depth == 0 and data:
+            self._chunks.append(data)
+
+    def get_text(self) -> str:
+        return "".join(self._chunks)
+
+
+def _extract_text_from_html(html_text: str) -> str:
+    if not html_text:
+        return ""
+    parser = _HTMLTextExtractor()
+    try:
+        parser.feed(html_text)
+        parser.close()
+    except Exception:
+        return ""
+    text = html.unescape(parser.get_text() or "")
+    text = text.replace("\r", "")
+    text = re.sub(r"[ \t]+", " ", text)
+    lines = [line.strip() for line in text.split("\n")]
+    lines = [line for line in lines if line]
+    return "\n".join(lines)
+
+
+def _fetch_fulltext(url: str, max_chars: int = 8000) -> Tuple[Optional[str], Optional[str], bool]:
+    if not url or not isinstance(url, str):
+        return None, "invalid url", False
+    if not url.startswith("http"):
+        return None, "unsupported url scheme", False
+    try:
+        response = requests.get(
+            url,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                )
+            },
+            timeout=TIMEOUT,
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException as exc:
+        return None, str(exc), False
+
+    content_type = response.headers.get("Content-Type", "")
+    if content_type and "html" not in content_type.lower():
+        # 尝试解析，但标记为非 HTML 内容
+        pass
+
+    text = _extract_text_from_html(response.text)
+    if not text:
+        return None, "no text extracted", False
+
+    truncated = False
+    if max_chars and max_chars > 0 and len(text) > max_chars:
+        text = text[:max_chars].rstrip() + "\n...[truncated]"
+        truncated = True
+
+    return text, None, truncated
 
 
 @lru_cache(maxsize=1)
@@ -2235,6 +2341,7 @@ def get_match_details(match_id: int) -> str:
     payload = {field: data.get(field) for field in fields}
 
     hero_map = _build_hero_map()
+    item_map = _load_items_map()
     duration = int(payload.get("duration") or 0)
     minutes, seconds = divmod(duration, 60)
     radiant_win = payload.get("radiant_win")
@@ -2259,8 +2366,8 @@ def get_match_details(match_id: int) -> str:
     if players:
         # 天辉方
         lines.append("## 🟢 天辉方 (Radiant)")
-        lines.append("| 英雄 | 选手 | 选手ID | K/D/A | GPM | XPM | 经济 | 英雄伤害 | 塔伤 |")
-        lines.append("|------|------|--------|-------|-----|-----|------|----------|------|")
+        lines.append("| 英雄 | 选手 | 选手ID | K/D/A | GPM | XPM | 经济 | 英雄伤害 | 塔伤 | 装备 |")
+        lines.append("|------|------|--------|-------|-----|-----|------|----------|------|------|")
         for p in players:
             if p.get("isRadiant", p.get("player_slot", 128) < 128):
                 hero_en = hero_map.get(p.get("hero_id"), f"Hero {p.get('hero_id')}")
@@ -2268,17 +2375,26 @@ def get_match_details(match_id: int) -> str:
                 player_name = p.get("name") or p.get("personaname") or "Unknown"
                 player_id = p.get("account_id") if p.get("account_id") is not None else "Unknown"
                 kda = f"{p.get('kills', 0)}/{p.get('deaths', 0)}/{p.get('assists', 0)}"
+                item_names: List[str] = []
+                for slot in range(6):
+                    item_entry = _build_item_entry(p.get(f"item_{slot}"), item_map)
+                    if item_entry:
+                        item_name = item_entry.get("name") or str(item_entry.get("id"))
+                    else:
+                        item_name = "-"
+                    item_names.append(str(item_name))
+                items_display = " / ".join(item_names)
                 lines.append(
                     f"| {hero_cn} | {player_name} | {player_id} | {kda} | {p.get('gold_per_min', 0)} | "
                     f"{p.get('xp_per_min', 0)} | {p.get('net_worth', 0)} | "
-                    f"{p.get('hero_damage', 0)} | {p.get('tower_damage', 0)} |"
+                    f"{p.get('hero_damage', 0)} | {p.get('tower_damage', 0)} | {items_display} |"
                 )
 
         # 夜魇方
         lines.append("")
         lines.append("## 🔴 夜魇方 (Dire)")
-        lines.append("| 英雄 | 选手 | 选手ID | K/D/A | GPM | XPM | 经济 | 英雄伤害 | 塔伤 |")
-        lines.append("|------|------|--------|-------|-----|-----|------|----------|------|")
+        lines.append("| 英雄 | 选手 | 选手ID | K/D/A | GPM | XPM | 经济 | 英雄伤害 | 塔伤 | 装备 |")
+        lines.append("|------|------|--------|-------|-----|-----|------|----------|------|------|")
         for p in players:
             if not p.get("isRadiant", p.get("player_slot", 0) < 128):
                 hero_en = hero_map.get(p.get("hero_id"), f"Hero {p.get('hero_id')}")
@@ -2286,10 +2402,19 @@ def get_match_details(match_id: int) -> str:
                 player_name = p.get("name") or p.get("personaname") or "Unknown"
                 player_id = p.get("account_id") if p.get("account_id") is not None else "Unknown"
                 kda = f"{p.get('kills', 0)}/{p.get('deaths', 0)}/{p.get('assists', 0)}"
+                item_names: List[str] = []
+                for slot in range(6):
+                    item_entry = _build_item_entry(p.get(f"item_{slot}"), item_map)
+                    if item_entry:
+                        item_name = item_entry.get("name") or str(item_entry.get("id"))
+                    else:
+                        item_name = "-"
+                    item_names.append(str(item_name))
+                items_display = " / ".join(item_names)
                 lines.append(
                     f"| {hero_cn} | {player_name} | {player_id} | {kda} | {p.get('gold_per_min', 0)} | "
                     f"{p.get('xp_per_min', 0)} | {p.get('net_worth', 0)} | "
-                    f"{p.get('hero_damage', 0)} | {p.get('tower_damage', 0)} |"
+                    f"{p.get('hero_damage', 0)} | {p.get('tower_damage', 0)} | {items_display} |"
                 )
         lines.append("")
 
@@ -4203,6 +4328,158 @@ def search_players(query: str) -> str:
         lines.append(f"| {account_id} | {name} | {similarity:.2f} |")
     
     return "\n".join(lines)
+
+
+@mcp.tool()
+def search_dota_history(
+    query: str,
+    num_results: int = 5,
+    include_liquipedia: bool = True,
+    sites: Optional[List[str]] = None,
+    fetch_fulltext: bool = True,
+    fulltext_max_chars: int = 8000,
+) -> str:
+    """
+    ?? SerpApi ?? Dota ????????????????
+
+    Args:
+        query: ?????
+        num_results: ?????1-10???? 5
+        include_liquipedia: ?????? Liquipedia??? True?
+        sites: ?????????????? ["liquipedia.net/dota2", "gosugamers.net"]?
+        fetch_fulltext: ??????????????????????
+        fulltext_max_chars: ????????<=0 ?????
+
+    Returns:
+        ???????????????????????
+    """
+    api_key = os.getenv("SERPAPI_API_KEY", "").strip()
+    if not api_key:
+        return "❌ 未配置 SERPAPI_API_KEY，无法使用搜索工具"
+
+    query = (query or "").strip()
+    if not query:
+        return "❌ query 不能为空"
+
+    try:
+        limit = int(num_results)
+    except (TypeError, ValueError):
+        limit = 5
+    limit = max(1, min(limit, 10))
+    try:
+        max_chars = int(fulltext_max_chars)
+    except (TypeError, ValueError):
+        max_chars = 8000
+    max_chars = max(0, min(max_chars, 50000))
+
+    default_sites = [
+        "liquipedia.net/dota2",
+        "gosugamers.net",
+        "dotabuff.com",
+    ]
+    site_filters = []
+    if sites:
+        site_filters.extend([s.strip() for s in sites if isinstance(s, str) and s.strip()])
+    else:
+        site_filters.extend(default_sites)
+    if include_liquipedia and "liquipedia.net/dota2" not in site_filters:
+        site_filters.append("liquipedia.net/dota2")
+    site_filters = list(dict.fromkeys(site_filters))
+
+    search_query = query
+    if site_filters:
+        site_clause = " OR ".join([f"site:{s}" for s in site_filters])
+        search_query = f"{query} ({site_clause})"
+    used_query = search_query
+    used_site_filters = site_filters[:]
+    fallback_used = False
+
+    def _serpapi_request(q: str, hl: str) -> Dict[str, Any]:
+        response = requests.get(
+            SERPAPI_ENDPOINT,
+            params={
+                "engine": "google",
+                "q": q,
+                "num": limit,
+                "hl": hl,
+                "api_key": api_key,
+            },
+            timeout=TIMEOUT,
+        )
+        response.raise_for_status()
+        return response.json()
+
+    try:
+        data = _serpapi_request(search_query, "zh-CN")
+    except requests.exceptions.RequestException as exc:
+        return f"❌ SerpApi 请求失败: {exc}"
+    except ValueError:
+        return "❌ SerpApi 返回非 JSON 响应"
+
+    if isinstance(data, dict) and data.get("error"):
+        error_message = str(data["error"])
+        if "hasn't returned any results" in error_message and site_filters:
+            try:
+                data = _serpapi_request(query, "en")
+                used_query = query
+                used_site_filters = []
+                fallback_used = True
+            except requests.exceptions.RequestException as exc:
+                return f"❌ SerpApi 请求失败: {exc}"
+            except ValueError:
+                return "❌ SerpApi 返回非 JSON 响应"
+        else:
+            return f"❌ SerpApi 错误: {data['error']}"
+
+    results = data.get("organic_results") if isinstance(data, dict) else None
+    if not results:
+        if site_filters:
+            try:
+                data = _serpapi_request(query, "en")
+                used_query = query
+                used_site_filters = []
+                fallback_used = True
+            except requests.exceptions.RequestException as exc:
+                return f"❌ SerpApi 请求失败: {exc}"
+            except ValueError:
+                return "❌ SerpApi 返回非 JSON 响应"
+            results = data.get("organic_results") if isinstance(data, dict) else None
+        if not results:
+            return "⚠️ 未找到搜索结果"
+
+    payload = {
+        "query": query,
+        "search_query": used_query,
+        "site_filters": used_site_filters,
+        "fallback_used": fallback_used,
+        "fulltext_enabled": bool(fetch_fulltext),
+        "fulltext_max_chars": max_chars,
+        "results": [],
+    }
+
+    for item in results[:limit]:
+        link = str(item.get("link", ""))
+        if not link:
+            continue
+        result = {
+            "title": item.get("title"),
+            "snippet": item.get("snippet"),
+            "link": link,
+            "source": item.get("source"),
+            "date": item.get("date") or item.get("published_date"),
+        }
+        if fetch_fulltext:
+            full_text, err, truncated = _fetch_fulltext(link, max_chars=max_chars)
+            if err:
+                result["full_text_error"] = err
+            else:
+                result["full_text"] = full_text
+                result["full_text_chars"] = len(full_text) if full_text else 0
+                if truncated:
+                    result["full_text_truncated"] = True
+        payload["results"].append(result)
+
+    return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
