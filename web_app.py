@@ -17,6 +17,11 @@ BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR / "web"
 LOG_DIR = BASE_DIR / "logs"
 FIGURE_DIR = BASE_DIR / "figure"
+WARD_DIR = BASE_DIR / "ward_analysis"
+
+# Ensure required static directories exist
+for path in (LOG_DIR, FIGURE_DIR, WARD_DIR):
+    path.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="Dota2 ReAct Chat")
 agent = Dota2ReActAgent(enable_logging=True)
@@ -25,7 +30,7 @@ background_tasks: Set[asyncio.Task] = set()
 
 app.mount(
     "/ward_analysis",
-    StaticFiles(directory=BASE_DIR / "ward_analysis", html=True),
+    StaticFiles(directory=WARD_DIR, html=True),
     name="ward_analysis",
 )
 app.mount(
