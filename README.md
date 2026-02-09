@@ -28,13 +28,22 @@ pip install -r requirements.txt
    在项目根目录创建 `.env`：
 
 ```bash
-LLM_API_KEY=your_api_key
-LLM_BASE_URL=https://api.deepseek.com/v1
-LLM_MODEL_ID=deepseek-chat
+LLM_API_KEY="your_api_key"
+LLM_BASE_URL="https://api.deepseek.com/v1"
+LLM_MODEL_ID="deepseek-chat"
 SERPAPI_API_KEY=your_serpapi_key
 ```
 
+也可以申请豆包 API 来替代 DeepSeek（示例）：
+
+```bash
+LLM_API_KEY="your_api_key"
+LLM_MODEL_ID="doubao-seed-1-8-251228"
+LLM_BASE_URL="https://ark.cn-beijing.volces.com/api/v3"
+```
+
 4. 配置 OpenViking（可选，默认启用记忆）
+
    - 编辑 ov.conf，填入你的 embedding / VLM 供应商与 API Key
    - 如需自定义路径，可设置 OPENVIKING_CONFIG_FILE 指向配置文件
    - 运行后自动生成 ov_data/
