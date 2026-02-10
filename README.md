@@ -2,6 +2,21 @@
 
 基于 ReAct 推理框架的 Dota 2 数据分析系统，内置 MCP 工具用于查询比赛、战队、选手、英雄与视野相关数据，并提供 Web UI 进行交互式分析与报告展示。
 
+**系统介绍 🧭**
+
+本系统由 ReAct Agent、MCP 工具服务与 Web UI 组成：Agent 负责“思考-行动-观察”的多步推理流程，MCP 以工具化方式封装 OpenDota 数据查询与分析能力，Web UI 提供实时对话、历史回放与报告展示。系统支持视野热力图、眼位分析、战队与英雄画像等结果输出，并可选接入 OpenViking 记忆模块以提升多轮对话的上下文理解。
+
+**系统展示 🖼️**
+
+![首页](introduce/首页.png)
+![玩家单场比赛](introduce/玩家单场比赛.png)
+![单场比赛视野分析](introduce/单场比赛视野分析.png)
+![眼位存活统计](introduce/眼位存活统计.png)
+![视野热力图](introduce/视野热力图.png)
+![事业点位图](introduce/事业点位图.png)
+![战队英雄解析](introduce/战队英雄解析.png)
+![英雄介绍](introduce/英雄介绍.png)
+
 **功能概览 ✨**
 
 - ReAct 方式调用 MCP 工具完成多步分析
@@ -34,7 +49,7 @@ LLM_MODEL_ID="deepseek-chat"
 SERPAPI_API_KEY=your_serpapi_key
 ```
 
-也可以申请豆包 API 来替代 DeepSeek（示例）：
+也可以申请有一点免费token额度的豆包 API 来替代 DeepSeek（示例）：
 
 ```bash
 LLM_API_KEY="your_api_key"
