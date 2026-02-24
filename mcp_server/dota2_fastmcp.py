@@ -248,6 +248,168 @@ def _extract_text_from_html(html_text: str) -> str:
     return "\n".join(lines)
 
 
+def _render_inline_markdown(text: str) -> str:
+    """渲染行内 Markdown（强/弱强调、行内代码），其余内容做 HTML 转义。"""
+    escaped = html.escape(text or "")
+    escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
+    escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
+    escaped = re.sub(r"__([^_]+)__", r"<strong>\1</strong>", escaped)
+    escaped = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"<em>\1</em>", escaped)
+    escaped = re.sub(r"(?<!_)_([^_\n]+)_(?!_)", r"<em>\1</em>", escaped)
+    return escaped
+
+
+def _is_hr_line(line: str) -> bool:
+    s = (line or "").strip()
+    return bool(s and re.fullmatch(r"(?:-{3,}|(?:-\s*){3,})", s))
+
+
+def _split_md_table_row(line: str) -> List[str]:
+    trimmed = (line or "").strip()
+    if trimmed.startswith("|"):
+        trimmed = trimmed[1:]
+    if trimmed.endswith("|"):
+        trimmed = trimmed[:-1]
+    return [cell.strip() for cell in trimmed.split("|")]
+
+
+def _is_md_table_separator(line: str) -> bool:
+    return bool(re.fullmatch(r"\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*", line or ""))
+
+
+def _markdown_to_html_fragment(markdown_text: str) -> str:
+    """将常见 Markdown 报告转换为 HTML 片段，避免注入后出现 ##/*/----- 原样符号。"""
+    normalized = (markdown_text or "").replace("\r\n", "\n").replace("\r", "\n")
+    lines = normalized.split("\n")
+    blocks: List[str] = []
+    para_lines: List[str] = []
+    list_tag: Optional[str] = None
+    list_items: List[str] = []
+    ordered_start: Optional[int] = None
+    idx = 0
+
+    def flush_paragraph() -> None:
+        nonlocal para_lines
+        if para_lines:
+            blocks.append(f"<p>{'<br>'.join(para_lines)}</p>")
+            para_lines = []
+
+    def flush_list() -> None:
+        nonlocal list_tag, list_items, ordered_start
+        if list_tag and list_items:
+            start_attr = ""
+            if list_tag == "ol" and ordered_start and ordered_start > 1:
+                start_attr = f" start=\"{ordered_start}\""
+            blocks.append(f"<{list_tag}{start_attr}>" + "".join(list_items) + f"</{list_tag}>")
+        list_tag = None
+        list_items = []
+        ordered_start = None
+
+    while idx < len(lines):
+        line = lines[idx]
+        stripped = line.strip()
+
+        if not stripped:
+            flush_paragraph()
+            flush_list()
+            idx += 1
+            continue
+
+        if stripped in {"*", "-", "+", "•"}:
+            idx += 1
+            continue
+
+        if _is_hr_line(stripped):
+            flush_paragraph()
+            flush_list()
+            blocks.append("<hr>")
+            idx += 1
+            continue
+
+        # Pipe table: header + separator + body
+        if "|" in stripped and idx + 1 < len(lines) and _is_md_table_separator(lines[idx + 1]):
+            flush_paragraph()
+            flush_list()
+            header_cells = _split_md_table_row(stripped)
+            table_rows: List[List[str]] = []
+            j = idx + 2
+            while j < len(lines):
+                row_line = lines[j]
+                row_trim = row_line.strip()
+                if not row_trim or "|" not in row_trim:
+                    break
+                table_rows.append(_split_md_table_row(row_trim))
+                j += 1
+            width = len(header_cells)
+            for row in table_rows:
+                if len(row) > width:
+                    width = len(row)
+            if width > 0:
+                header = header_cells + [""] * (width - len(header_cells))
+                thead = "<tr>" + "".join(f"<th>{_render_inline_markdown(c)}</th>" for c in header) + "</tr>"
+                body_rows_html = []
+                for row in table_rows:
+                    padded = row + [""] * (width - len(row))
+                    body_rows_html.append(
+                        "<tr>" + "".join(f"<td>{_render_inline_markdown(c)}</td>" for c in padded) + "</tr>"
+                    )
+                blocks.append("<table><thead>" + thead + "</thead><tbody>" + "".join(body_rows_html) + "</tbody></table>")
+                idx = j
+                continue
+
+        heading_match = re.match(r"^\s*(#{1,4})\s+(.*)$", line)
+        if heading_match:
+            flush_paragraph()
+            flush_list()
+            level = len(heading_match.group(1))
+            content = _render_inline_markdown(heading_match.group(2).strip())
+            blocks.append(f"<h{level}>{content}</h{level}>")
+            idx += 1
+            continue
+
+        ordered_match = re.match(r"^\s*(\d+)\.\s+(.*)$", line)
+        if ordered_match:
+            flush_paragraph()
+            number = int(ordered_match.group(1))
+            if list_tag != "ol":
+                flush_list()
+                list_tag = "ol"
+                ordered_start = number
+            list_items.append(f"<li>{_render_inline_markdown(ordered_match.group(2).strip())}</li>")
+            idx += 1
+            continue
+
+        bullet_match = re.match(r"^\s*[-*+•]\s+(.*)$", line)
+        if bullet_match:
+            flush_paragraph()
+            if list_tag != "ul":
+                flush_list()
+                list_tag = "ul"
+            list_items.append(f"<li>{_render_inline_markdown(bullet_match.group(1).strip())}</li>")
+            idx += 1
+            continue
+
+        flush_list()
+        para_lines.append(_render_inline_markdown(stripped))
+        idx += 1
+
+    flush_paragraph()
+    flush_list()
+    return "\n".join(blocks)
+
+
+def _normalize_report_fragment(content: str) -> str:
+    """
+    归一化报告片段：若已是 HTML 则原样返回；否则按 Markdown/纯文本转 HTML。
+    """
+    text = (content or "").strip()
+    if not text:
+        return ""
+    if re.search(r"<[a-zA-Z][^>]*>", text):
+        return text
+    return _markdown_to_html_fragment(text)
+
+
 def _fetch_fulltext(url: str, max_chars: int = 8000) -> Tuple[Optional[str], Optional[str], bool]:
     if not url or not isinstance(url, str):
         return None, "invalid url", False
@@ -1837,7 +1999,7 @@ class WardAnalyzer:
         .stats {{ display: flex; justify-content: center; gap: 40px; margin-top: 15px; font-size: 14px; }}
         .stat-item {{ text-align: center; }}
         .stat-value {{ font-size: 24px; font-weight: 600; color: #d7c27a; }}
-        .filters {{ max-width: 800px; margin: 16px auto 0; background: #121212; padding: 12px 16px; border-radius: 10px; border: 1px solid #1f1f1f; }}
+        .filters {{ margin-top: 12px; background: rgba(255,255,255,0.04); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); }}
         .filters-header {{ display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }}
         .filters-title {{ font-size: 14px; color: #f0f0f0; font-weight: 600; }}
         .filter-actions {{ display: flex; gap: 8px; }}
@@ -1908,21 +2070,21 @@ class WardAnalyzer:
                         <div>总眼位数</div>
                     </div>
                 </div>
-            </div>
-            {heatmap_html}
-        </div>
 
-        <div class="filters">
-            <div class="filters-header">
-                <div class="filters-title">按选手筛选眼位</div>
-                <div class="filter-actions">
-                    <button class="filter-button" id="selectAllPlayers">全选</button>
-                    <button class="filter-button" id="clearAllPlayers">清空</button>
+                <div class="filters">
+                    <div class="filters-header">
+                        <div class="filters-title">按选手筛选眼位</div>
+                        <div class="filter-actions">
+                            <button class="filter-button" id="selectAllPlayers">全选</button>
+                            <button class="filter-button" id="clearAllPlayers">清空</button>
+                        </div>
+                    </div>
+                    <div class="filter-list" id="playerFilters">
+                        {player_filter_html}
+                    </div>
                 </div>
             </div>
-            <div class="filter-list" id="playerFilters">
-                {player_filter_html}
-            </div>
+            {heatmap_html}
         </div>
 
         <section class="report" id="analysisReport">
@@ -4895,9 +5057,9 @@ def analyze_multi_match_wards(
     resolved_match_ids: List[int] = []
     source_label = "custom"
     source_display = "custom"
-    if match_ids:
-        resolved_match_ids = [int(mid) for mid in match_ids if mid is not None]
-    elif team_id:
+
+    # 如果显式传入 team_id/account_id（即便同时传 match_ids），标题和产物命名仍应使用实体来源
+    if team_id:
         source_label = f"team_{team_id}"
         source_display = source_label
         team_info = _make_request(f"teams/{team_id}")
@@ -4905,6 +5067,13 @@ def analyze_multi_match_wards(
             team_name = team_info.get("name") or team_info.get("tag") or f"Team {team_id}"
             team_tag = team_info.get("tag")
             source_display = f"{team_name} ({team_tag})" if team_tag and team_tag not in team_name else str(team_name)
+    elif account_id:
+        source_label = f"player_{account_id}"
+        source_display = source_label
+
+    if match_ids:
+        resolved_match_ids = [int(mid) for mid in match_ids if mid is not None]
+    elif team_id:
         matches_data = _make_request(f"teams/{team_id}/matches")
         if isinstance(matches_data, dict) and "error" in matches_data:
             return f"❌ API 错误: {matches_data['error']}"
@@ -4913,8 +5082,6 @@ def analyze_multi_match_wards(
         matches_sorted = sorted(matches_data, key=lambda x: x.get("start_time", 0), reverse=True)
         resolved_match_ids = [int(m.get("match_id")) for m in matches_sorted[:limit] if m.get("match_id")]
     elif account_id:
-        source_label = f"player_{account_id}"
-        source_display = source_label
         matches_data = _make_request(f"players/{account_id}/recentMatches")
         if isinstance(matches_data, dict) and "error" in matches_data:
             return f"❌ API 错误: {matches_data['error']}"
@@ -4939,6 +5106,8 @@ def analyze_multi_match_wards(
     tower_events: List[Dict[str, Any]] = []
     match_summaries: List[Dict[str, Any]] = []
     skipped: List[Dict[str, Any]] = []
+    team_presence_counts: Dict[int, int] = {}
+    team_name_by_id: Dict[int, str] = {}
     max_match_duration = 0
     max_ward_time = 0
 
@@ -4961,6 +5130,24 @@ def analyze_multi_match_wards(
 
         radiant_label = match_data.get("radiant_name") or "Radiant"
         dire_label = match_data.get("dire_name") or "Dire"
+
+        if match_ids and not team_id and not account_id:
+            teams_in_match = set()
+            for raw_tid, raw_name in (
+                (match_data.get("radiant_team_id"), radiant_label),
+                (match_data.get("dire_team_id"), dire_label),
+            ):
+                try:
+                    team_id_int = int(raw_tid) if raw_tid is not None else None
+                except (TypeError, ValueError):
+                    team_id_int = None
+                if team_id_int is None or team_id_int in teams_in_match:
+                    continue
+                teams_in_match.add(team_id_int)
+                team_presence_counts[team_id_int] = team_presence_counts.get(team_id_int, 0) + 1
+                name_text = str(raw_name).strip() if raw_name else ""
+                if name_text and name_text.lower() not in {"radiant", "dire", "天辉", "夜魇"}:
+                    team_name_by_id.setdefault(team_id_int, name_text)
 
         def _role_label(lane_role: Any) -> str:
             role_map = {
@@ -5238,6 +5425,22 @@ def analyze_multi_match_wards(
             "kill_count": kill_count,
             "tower_count": tower_count,
         })
+
+    if match_ids and not team_id and not account_id and source_label == "custom" and match_summaries:
+        total_matches = len(match_summaries)
+        if team_presence_counts:
+            best_team_id, best_count = max(
+                team_presence_counts.items(),
+                key=lambda item: item[1],
+            )
+            majority_threshold = max(2, (total_matches + 1) // 2)
+            if best_count >= majority_threshold:
+                source_label = f"team_{best_team_id}"
+                inferred_name = team_name_by_id.get(best_team_id) or f"Team {best_team_id}"
+                if best_count == total_matches:
+                    source_display = inferred_name
+                else:
+                    source_display = f"{inferred_name}（主要样本 {best_count}/{total_matches} 场）"
 
     if not obs_rows and not sen_rows:
         return "❌ 未获取到目标眼位数据（可能比赛未解析或无观察者数据）"
@@ -6843,6 +7046,9 @@ def inject_ward_report_html(
 
     if not report_html or not report_html.strip():
         return "❌ 报告内容为空，未写入"
+    report_html = _normalize_report_fragment(report_html)
+    if not report_html:
+        return "❌ 报告内容为空，未写入"
 
     try:
         with open(html_path, "r", encoding="utf-8") as f:
@@ -6978,4 +7184,3 @@ def get_live_matches(limit: int = 10) -> str:
 
 if __name__ == "__main__":
     mcp.run()
-

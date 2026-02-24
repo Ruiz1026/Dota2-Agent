@@ -161,7 +161,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      padding: 8px 0 16px;
+      padding: 8px 0 140px;
       overflow-y: auto;
     }
     .preset-panel {
@@ -444,6 +444,9 @@
       padding: 12px 14px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
       transition: border-color 0.2s ease;
+      position: fixed;
+      bottom: 12px;
+      z-index: 40;
     }
     .composer:focus-within {
       border-color: #2a2a2a;
@@ -494,11 +497,7 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: #777;
-    }
+    footer { display: none; }
     @media (max-width: 980px) {
       .layout {
         flex-direction: column;
@@ -510,6 +509,9 @@
       }
       .preset-grid {
         grid-template-columns: repeat(2, minmax(200px, 1fr));
+      }
+      .chat {
+        padding-bottom: 160px;
       }
     }
     @keyframes fadeIn {
@@ -598,6 +600,8 @@
     const historyList = document.getElementById('historyList');
     const newChatBtn = document.getElementById('newChatBtn');
     const presetPanel = document.getElementById('presetPanel');
+    const appRoot = document.querySelector('.app');
+    const composer = document.querySelector('.composer');
     let activeHistoryItem = null;
     let pendingNewSession = false;
     let activeSessionId = null;
@@ -606,6 +610,7 @@
     let tempSessionCounter = 0;
     let historyPollTimer = null;
     let activeSessionSignature = null;
+    const ACTIVE_SESSION_KEY = 'dota2_active_session_id';
     const MAX_STATUS_CHARS = 3000;
     const MAX_OBSERVATION_CHARS = 800;
     const STATUS_TYPER_SPEED = 6;
@@ -620,11 +625,21 @@
     }
 
     function renderInline(text) {
-      const escaped = escapeHtml(text);
-      return escaped
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>');
+      const escaped = escapeHtml(String(text || ''));
+      const codeSpans = [];
+      const withCodePlaceholders = escaped.replace(/`([^`]+)`/g, (_, code) => {
+        const token = `@@CODE_${codeSpans.length}@@`;
+        codeSpans.push(`<code>${code}</code>`);
+        return token;
+      });
+      let rendered = withCodePlaceholders
+        .replace(/~~([^~\n]+)~~/g, '<del>$1</del>')
+        .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/__([^_\n]+)__/g, '<strong>$1</strong>')
+        .replace(/(^|[\s(（【])\*([^*\n]+)\*(?=$|[\s).,，!?;:：；）】])/g, '$1<em>$2</em>')
+        .replace(/(^|[\s(（【])_([^_\n]+)_(?=$|[\s).,，!?;:：；）】])/g, '$1<em>$2</em>');
+      rendered = rendered.replace(/@@CODE_(\d+)@@/g, (_, idx) => codeSpans[Number(idx)] || '');
+      return rendered;
     }
 
     function truncateText(text, maxChars) {
@@ -763,10 +778,25 @@
       '大招附带乐曲技能',
     ]);
 
+    function isMarkdownListLine(line) {
+      return /^\s*(?:[-*+•]|\d+\.)\s+/.test(line || '');
+    }
+
     function hasPlainTableLine(line) {
       if (!line) return false;
       if (line.includes('|')) return false;
-      return /\t+|\s{2,}/.test(line.trim());
+      const trimmed = line.trim();
+      if (!trimmed) return false;
+      if (/^#{1,6}\s+/.test(trimmed)) return false;
+      if (isLooseHorizontalRule(trimmed)) return false;
+      if (isMarkerOnlyLine(trimmed)) return false;
+      if (isMarkdownListLine(trimmed)) return false;
+      if (!/\t+|\s{2,}/.test(trimmed)) return false;
+      const cells = trimmed.split(/\t+|\s{2,}/).map((cell) => cell.trim()).filter(Boolean);
+      if (cells.length < 2) return false;
+      const first = cells[0] || '';
+      if (/^[-*+•]$/.test(first) || /^\d+\.$/.test(first)) return false;
+      return true;
     }
 
     function parsePlainTable(lines, startIndex) {
@@ -778,6 +808,8 @@
         .map((cell) => cell.trim())
         .filter(Boolean);
       const headerCells = splitCells(headerLine);
+      const headerFirst = headerCells[0] || '';
+      if (/^[-*+•]$/.test(headerFirst) || /^\d+\.$/.test(headerFirst)) return null;
       if (headerCells.length < 2) return null;
       const bodyRows = [];
       let index = startIndex + 1;
@@ -786,6 +818,8 @@
         if (!current.trim()) break;
         if (!hasPlainTableLine(current)) break;
         const rowCells = splitCells(current);
+        const first = rowCells[0] || '';
+        if (/^[-*+•]$/.test(first) || /^\d+\.$/.test(first)) break;
         if (rowCells.length < 2) break;
         bodyRows.push(rowCells);
         index += 1;
@@ -797,12 +831,27 @@
       return { lines: tableLines, nextIndex: index };
     }
 
+    function isLooseHorizontalRule(line) {
+      const trimmed = (line || '').trim();
+      return /^(?:-{3,}|(?:-\s*){3,})$/.test(trimmed);
+    }
+
+    function isMarkerOnlyLine(line) {
+      return /^[-*+•]\s*$/.test((line || '').trim());
+    }
+
     function normalizePlainTextToMarkdown(text) {
       if (!text) return '';
-      const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      const lines = normalized.split('\n');
+      const normalized = sanitizeCodeFences(text)
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .replace(/\u00A0/g, ' ')
+        .replace(/\u200B/g, '')
+        .replace(/\t/g, '    ');
+      const lines = normalized.split('\n').map((line) => line.replace(/＃/g, '#'));
       const output = [];
       let i = 0;
+
       while (i < lines.length) {
         const line = lines[i];
         const trimmed = line.trim();
@@ -811,42 +860,73 @@
           i += 1;
           continue;
         }
-        if (trimmed.includes('视野分析报告')) {
-          output.push(`## ${trimmed}`);
+
+        // 标准化标题：支持 "##标题" 与全角井号
+        const headingNoSpace = trimmed.match(/^(#{1,6})(\S.*)$/);
+        if (headingNoSpace) {
+          output.push(`${headingNoSpace[1]} ${headingNoSpace[2]}`);
           i += 1;
           continue;
         }
+        if (/^#{1,6}\s+/.test(trimmed)) {
+          output.push(trimmed);
+          i += 1;
+          continue;
+        }
+
+        if (isMarkerOnlyLine(trimmed)) {
+          i += 1;
+          continue;
+        }
+        if (isLooseHorizontalRule(trimmed)) {
+          output.push('---');
+          i += 1;
+          continue;
+        }
+
+        // 标准化列表：支持 -,*,+,• 与 1) / 1.
+        const unordered = trimmed.match(/^[-*+•]\s*(.+)$/);
+        if (unordered && unordered[1]) {
+          output.push(`- ${unordered[1].trim()}`);
+          i += 1;
+          continue;
+        }
+        const ordered = trimmed.match(/^(\d+)[\.\)]\s*(.+)$/);
+        if (ordered && ordered[2]) {
+          output.push(`${ordered[1]}. ${ordered[2].trim()}`);
+          i += 1;
+          continue;
+        }
+
+        // 兼容部分领域文本标题
         if (/^[一二三四五六七八九十]+、/.test(trimmed)) {
           const title = trimmed.replace(/^[一二三四五六七八九十]+、\s*/, '');
           output.push(`### ${title}`);
           i += 1;
           continue;
         }
-        if (/^新英雄[:：]/.test(trimmed)) {
-          output.push(`## ${trimmed}`);
-          i += 1;
-          continue;
-        }
         if (SECTION_HEADINGS.has(trimmed)) {
-          const level = trimmed === '大招附带乐曲技能' ? '####' : '###';
-          output.push(`${level} ${trimmed}`);
+          output.push(`### ${trimmed}`);
           i += 1;
           continue;
         }
         if (/^参数[:：]?$/.test(trimmed)) {
-          output.push(`**参数：**`);
+          output.push('### 参数');
           i += 1;
           continue;
         }
+
         const tableBlock = parsePlainTable(lines, i);
         if (tableBlock) {
           output.push(...tableBlock.lines);
           i = tableBlock.nextIndex;
           continue;
         }
-        output.push(line);
+
+        output.push(trimmed);
         i += 1;
       }
+
       return output.join('\n');
     }
 
@@ -875,13 +955,16 @@
       if (!content) return false;
       const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
       const lines = normalized.split('\n');
-      if (lines.some((line) => /^\s{0,3}#{1,6}\s+/.test(line))) {
+      if (lines.some((line) => /^\s*#{1,6}\s*\S/.test(line))) {
         return true;
       }
-      if (lines.some((line) => /^\s{0,3}([-*]|\d+\.)\s+/.test(line))) {
+      if (lines.some((line) => /^\s*(?:[-*+•]|\d+\.)\s+/.test(line))) {
         return true;
       }
-      if (lines.some((line) => SECTION_HEADINGS.has(line.trim()) || /^新英雄[:：]/.test(line.trim()))) {
+      if (lines.some((line) => isLooseHorizontalRule(line))) {
+        return true;
+      }
+      if (lines.some((line) => SECTION_HEADINGS.has(line.trim()))) {
         return true;
       }
       for (let idx = 0; idx < lines.length - 1; idx += 1) {
@@ -901,7 +984,7 @@
 
     function renderMarkdown(text) {
       if (!text) return '';
-      const normalized = normalizePlainTextToMarkdown(sanitizeCodeFences(text));
+      const normalized = normalizePlainTextToMarkdown(text);
       const lines = normalized.split('\n');
       const output = [];
       let i = 0;
@@ -909,6 +992,15 @@
       while (i < lines.length) {
         const line = lines[i];
         if (!line.trim()) {
+          i += 1;
+          continue;
+        }
+        if (isMarkerOnlyLine(line)) {
+          i += 1;
+          continue;
+        }
+        if (isLooseHorizontalRule(line)) {
+          output.push('<hr>');
           i += 1;
           continue;
         }
@@ -947,29 +1039,38 @@
           continue;
         }
 
-        const headingMatch = line.match(/^(#{1,4})\s+(.*)$/);
+        const headingMatch = line.match(/^\s*(#{1,6})\s+(.*)$/);
         if (headingMatch) {
-          const level = headingMatch[1].length;
-          const content = renderInline(headingMatch[2].trim());
+          const level = Math.min(4, headingMatch[1].length);
+          // 容错：当模型/历史文本出现 "# # 标题" 之类格式时，去掉内容前的冗余井号
+          const rawHeading = headingMatch[2].trim().replace(/^(?:#+\s+)+/, '');
+          const content = renderInline(rawHeading);
           output.push(`<h${level}>${content}</h${level}>`);
           i += 1;
           continue;
         }
 
-        const listMatch = line.match(/^\s{0,3}(\d+\.|[-*])\s+(.*)$/);
+        const listMatch = line.match(/^(\s*)(\d+\.|[-*+•])\s+(.*)$/);
         if (listMatch) {
-          const isOrdered = /\d+\./.test(listMatch[1]);
+          const baseIndent = listMatch[1].length;
+          const isOrdered = /\d+\./.test(listMatch[2]);
           const tag = isOrdered ? 'ol' : 'ul';
-          const startNumber = isOrdered ? Number.parseInt(listMatch[1], 10) : null;
+          const startNumber = isOrdered ? Number.parseInt(listMatch[2], 10) : null;
           const startAttr = isOrdered && Number.isFinite(startNumber) && startNumber > 1
             ? ` start="${startNumber}"`
             : '';
           const items = [];
           while (i < lines.length) {
             const current = lines[i];
-            const currentMatch = current.match(/^\s{0,3}(\d+\.|[-*])\s+(.*)$/);
+            const currentMatch = current.match(/^(\s*)(\d+\.|[-*+•])\s+(.*)$/);
             if (!currentMatch) break;
-            items.push(`<li>${renderInline(currentMatch[2].trim())}</li>`);
+            const currentIndent = currentMatch[1].length;
+            const currentOrdered = /\d+\./.test(currentMatch[2]);
+            // 不同类型（有序/无序）或不同缩进视为新列表，避免错误续号
+            if (currentOrdered !== isOrdered || currentIndent !== baseIndent) {
+              break;
+            }
+            items.push(`<li>${renderInline(currentMatch[3].trim())}</li>`);
             i += 1;
           }
           output.push(`<${tag}${startAttr}>${items.join('')}</${tag}>`);
@@ -979,9 +1080,16 @@
         const paragraphLines = [];
         while (i < lines.length && lines[i].trim()) {
           const candidate = lines[i];
+          if (isMarkerOnlyLine(candidate)) {
+            i += 1;
+            continue;
+          }
+          if (isLooseHorizontalRule(candidate)) {
+            break;
+          }
           const isBlockStart = candidate.startsWith('```')
-            || /^(#{1,4})\s+/.test(candidate)
-            || /^\s{0,3}(\d+\.|[-*])\s+/.test(candidate)
+            || /^\s*(#{1,4})\s+/.test(candidate)
+            || /^\s*(\d+\.|[-*+•])\s+/.test(candidate)
             || !!parseTable(lines, i);
           if (isBlockStart) {
             if (paragraphLines.length === 0) {
@@ -1057,6 +1165,14 @@
       if (activeHistoryItem) {
         activeHistoryItem.classList.add('active');
       }
+    }
+
+    function persistActiveSession() {
+      if (!activeSessionId || String(activeSessionId).startsWith('temp-')) {
+        sessionStorage.removeItem(ACTIVE_SESSION_KEY);
+        return;
+      }
+      sessionStorage.setItem(ACTIVE_SESSION_KEY, String(activeSessionId));
     }
 
     function ensureSession(sessionId) {
@@ -1236,6 +1352,7 @@
       }
 
       activeSessionId = sessionId;
+      persistActiveSession();
       renderHistoryFromStore();
     }
 
@@ -1297,7 +1414,9 @@
       const latest = list[list.length - 1];
       const running = list.some((conv) => conv.status === 'running');
       const latestId = latest?.conversation_id || latest?.local_id || '';
-      return `${list.length}|${latestId}|${latest?.timestamp || ''}|${latest?.status || ''}|${running}`;
+      const finalLen = String(latest?.final_answer || '').length;
+      const wardHtml = String(latest?.ward_html || '');
+      return `${list.length}|${latestId}|${latest?.timestamp || ''}|${latest?.status || ''}|${running}|${finalLen}|${wardHtml}`;
     }
 
     function renderSessionConversations(conversations) {
@@ -1365,7 +1484,13 @@
       }
       const signature = getSessionSignature(activeSessionId);
       if (!signature) return;
-      if (signature === activeSessionSignature) {
+      const session = sessionStore.get(activeSessionId);
+      const needsHydration = !!(session && session.conversations.some((conv) => {
+        const status = String(conv.status || 'unknown');
+        const finalAnswer = String(conv.final_answer || '').trim();
+        return status !== 'running' && !finalAnswer;
+      }));
+      if (signature === activeSessionSignature && !needsHydration) {
         return;
       }
       activeSessionSignature = signature;
@@ -1389,6 +1514,7 @@
         }
       }
       activeSessionId = sessionId;
+      persistActiveSession();
       if (btn) {
         setActiveHistoryItem(btn);
       }
@@ -1512,6 +1638,19 @@
     function autoResize() {
       input.style.height = 'auto';
       input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+      updateComposerDock();
+    }
+
+    function updateComposerDock() {
+      if (!composer || !appRoot || !chat) return;
+      const viewportPadding = 12;
+      const rect = appRoot.getBoundingClientRect();
+      const left = Math.max(viewportPadding, Math.round(rect.left));
+      const right = Math.max(viewportPadding, Math.round(window.innerWidth - rect.right));
+      composer.style.left = `${left}px`;
+      composer.style.right = `${right}px`;
+      const composerHeight = composer.offsetHeight || 0;
+      chat.style.paddingBottom = `${composerHeight + 28}px`;
     }
 
     async function sendMessage() {
@@ -1767,10 +1906,13 @@
 
     sendBtn.addEventListener('click', sendMessage);
     input.addEventListener('input', autoResize);
+    window.addEventListener('resize', updateComposerDock);
+    window.addEventListener('scroll', updateComposerDock, { passive: true });
     newChatBtn.addEventListener('click', () => {
       clearChat();
       setActiveHistoryItem(null);
       activeSessionId = null;
+      persistActiveSession();
       if (currentStream) {
         currentStream.detached = true;
         currentStream.ui = null;
@@ -1795,7 +1937,14 @@
         sendMessage();
       }
     });
-    loadHistory();
+    autoResize();
+    updateComposerDock();
+    loadHistory().then(async () => {
+      const savedSessionId = sessionStorage.getItem(ACTIVE_SESSION_KEY);
+      if (savedSessionId && sessionStore.has(savedSessionId)) {
+        await loadSession(savedSessionId);
+      }
+    });
     startHistoryPolling();
   </script>
 </body>

@@ -89,12 +89,15 @@ def _load_history() -> List[Dict[str, str]]:
             user_input = conv.get("user_input") or ""
             timestamp = conv.get("timestamp")
             status = conv.get("status") or "unknown"
+            final_answer = conv.get("final_answer") or ""
             items.append({
                 "session_id": str(session_id),
                 "conversation_id": str(conv_id),
                 "user_input": str(user_input),
+                "final_answer": str(final_answer),
                 "timestamp": str(timestamp or ""),
                 "status": str(status),
+                "ward_html": _resolve_ward_html(conv),
             })
 
     items.sort(
@@ -111,6 +114,29 @@ def _extract_ward_html_path(text: Optional[str]) -> Optional[str]:
     if match:
         return "/" + match.group(1).replace("\\", "/")
     return None
+
+
+def _resolve_ward_html(conv: Dict) -> str:
+    direct = str(conv.get("ward_html") or "").strip()
+    if direct:
+        if direct.startswith("ward_analysis/") or direct.startswith("ward_analysis\\"):
+            return "/" + direct.replace("\\", "/")
+        return direct.replace("\\", "/")
+    final_answer = conv.get("final_answer") or ""
+    extracted = _extract_ward_html_path(final_answer)
+    if extracted:
+        return extracted
+
+    iterations = conv.get("iterations")
+    if isinstance(iterations, list):
+        for item in reversed(iterations):
+            if not isinstance(item, dict):
+                continue
+            observation = item.get("observation")
+            extracted = _extract_ward_html_path(observation)
+            if extracted:
+                return extracted
+    return ""
 
 
 def _load_session(session_id: str) -> Dict:
@@ -147,7 +173,7 @@ async def conversation(session_id: str, conversation_id: int) -> Dict[str, str]:
         "user_input": str(data.get("user_input") or ""),
         "final_answer": str(final_answer),
         "status": str(data.get("status") or "unknown"),
-        "ward_html": _extract_ward_html_path(final_answer) or "",
+        "ward_html": _resolve_ward_html(data),
     }
 
 
@@ -164,7 +190,7 @@ async def session(session_id: str) -> Dict[str, object]:
             "user_input": str(conv.get("user_input") or ""),
             "final_answer": str(final_answer),
             "status": str(conv.get("status") or "unknown"),
-            "ward_html": _extract_ward_html_path(final_answer) or "",
+            "ward_html": _resolve_ward_html(conv),
         })
 
     return {

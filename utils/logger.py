@@ -57,6 +57,7 @@ class ConversationLogger:
             "user_input": user_input,
             "iterations": [],
             "final_answer": None,
+            "ward_html": "",
             "total_iterations": 0,
             "status": "running"
         }
@@ -97,12 +98,19 @@ class ConversationLogger:
         self._mark_dirty()
         self._maybe_save()
     
-    def end_conversation(self, final_answer: str, status: str = "success"):
+    def end_conversation(
+        self,
+        final_answer: str,
+        status: str = "success",
+        ward_html: Optional[str] = None,
+    ):
         """结束对话"""
         if not self.current_conversation:
             return
         
         self.current_conversation["final_answer"] = final_answer
+        if ward_html is not None:
+            self.current_conversation["ward_html"] = str(ward_html)
         self.current_conversation["status"] = status
         self.current_conversation["end_timestamp"] = datetime.now().isoformat()
 
