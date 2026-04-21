@@ -115,3 +115,11 @@ hello_agents/
 
 - 数据来源：OpenDota API
 - MCP 工具说明详见 `MCP_README.md`
+
+## 2026-04 Memory And Tooling Updates
+
+- OpenViking memory retrieval now keeps a longer default timeout and exposes clearer search status via `memory_status`.
+- `memory_search` now supports a local file fallback when OpenViking search times out or returns no hits, which makes memory debugging easier.
+- Runtime tool calling now includes preflight validation for tool names and parameter names, with repair hints returned to the model when a call is malformed.
+- Added the bundled workflow skill `team_hero_analysis` for team hero pool, recent hero usage, and recent item-route analysis.
+- Final-answer normalization was improved so the agent is less likely to emit a full answer outside `Final Answer:`.

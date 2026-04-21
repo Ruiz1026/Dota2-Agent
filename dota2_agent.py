@@ -4,10 +4,11 @@ Dota 2 ReAct Agent
 使用 ReAct 范式 + MCP 工具调用
 """
 
+import asyncio
+import difflib
+import json
 import os
 import re
-import json
-import asyncio
 from pathlib import Path
 from typing import Optional, Dict, Any, List, AsyncGenerator, Tuple
 from dotenv import load_dotenv
@@ -81,7 +82,7 @@ class Dota2ReActAgent:
         memory_commit_only_success: bool = True,
         memory_retrieve_every_n: int = 1,
         memory_retrieve_min_chars: int = 12,
-        memory_retrieve_timeout: float = 2.0,
+        memory_retrieve_timeout: float = 4.0,
         memory_commit_timeout: float = 1.2,
         memory_record_user_min_chars: int = 8,
         memory_record_assistant_min_chars: int = 80,
@@ -187,6 +188,8 @@ class Dota2ReActAgent:
         self._last_assistant_answer = ""
         self._recent_turns: List[Dict[str, str]] = []
         self._last_llm_finish_reason: Optional[str] = None
+        self._loaded_skills_current_turn: List[str] = []
+        self._tool_history_current_turn: List[str] = []
         
         # LLM 客户端
         if HAS_OPENAI and self.llm_api_key:
@@ -237,7 +240,7 @@ class Dota2ReActAgent:
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "技能名称，例如 ward_analysis/team_recent_analysis/item_mapping/hero_intro",
+                        "description": "技能名称，例如 team_recent_analysis/team_hero_analysis 或 tool:get_match_details",
                     }
                 },
                 "required": ["name"],
@@ -407,18 +410,36 @@ class Dota2ReActAgent:
             return ""
         budget = self.runtime_tools_context_chars if max_chars is None else int(max_chars)
         tools = selected_tools or self._select_context_tools(user_input=user_input, memory_context=memory_context)
+        all_tool_names = sorted(
+            [
+                str(tool.get("name") or "").strip()
+                for tool in self.mcp_tools
+                if str(tool.get("name") or "").strip()
+            ]
+        )
         lines = [
-            f"运行时候选工具（仅可使用运行时注册工具；展示 {len(tools)}/{len(self.mcp_tools)}）："
+            "运行时工具约束：只能使用已注册工具名，必须精确拼写，禁止自造工具名或参数名。",
+            "全部已注册工具名：",
+            ", ".join(all_tool_names),
+            "",
+            f"高相关工具速查（展示 {len(tools)}/{len(self.mcp_tools)}）：",
         ]
-        for tool in tools:
+        for tool in tools[:10]:
             name = str(tool.get("name") or "").strip()
             if not name:
                 continue
+            signature = self._tool_signature(tool, max_params=6)
             desc = re.sub(r"\s+", " ", str(tool.get("description") or "").strip())
-            if len(desc) > 72:
-                desc = desc[:69] + "..."
-            lines.append(f"- {name}: {desc}" if desc else f"- {name}")
-        lines.append('工具参数或流程不确定时：调用 load_skill，示例 {"name":"tool:get_match_details"}')
+            if len(desc) > 64:
+                desc = desc[:61] + "..."
+            param_hint = self._tool_param_hint(tool, max_optional=4)
+            if desc and param_hint:
+                lines.append(f"- {signature}: {desc} | {param_hint}")
+            elif desc:
+                lines.append(f"- {signature}: {desc}")
+            else:
+                lines.append(f"- {signature}")
+        lines.append('工具名或参数不确定时：先调用 load_skill，示例 {"name":"tool:get_match_details"}，按返回的参数名重试。')
         text = "\n".join(lines)
         return self._clip_context_text(text, budget)
 
@@ -449,6 +470,172 @@ class Dota2ReActAgent:
             if str(tool.get("name") or "").strip() == key:
                 return tool
         return None
+
+    @staticmethod
+    def _tool_schema_parts(tool: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any], set]:
+        schema = tool.get("inputSchema") if isinstance(tool.get("inputSchema"), dict) else {}
+        props = schema.get("properties") if isinstance(schema.get("properties"), dict) else {}
+        required = schema.get("required") if isinstance(schema.get("required"), list) else []
+        required_set = {str(x) for x in required}
+        return schema, props, required_set
+
+    def _tool_signature(self, tool: Dict[str, Any], max_params: int = 8) -> str:
+        name = str(tool.get("name") or "").strip()
+        if not name:
+            return ""
+        _, props, required_set = self._tool_schema_parts(tool)
+        if not props:
+            return f"{name}()"
+
+        ordered_params = [str(p) for p in props.keys() if str(p) in required_set]
+        ordered_params.extend([str(p) for p in props.keys() if str(p) not in required_set])
+        labels: List[str] = []
+        for idx, param_name in enumerate(ordered_params):
+            if idx >= max_params:
+                labels.append("...")
+                break
+            label = param_name if param_name in required_set else f"{param_name}?"
+            labels.append(label)
+        return f"{name}({', '.join(labels)})"
+
+    def _tool_param_hint(self, tool: Dict[str, Any], max_optional: int = 4) -> str:
+        _, props, required_set = self._tool_schema_parts(tool)
+        if not props:
+            return "无参数"
+        required_names = [str(p) for p in props.keys() if str(p) in required_set]
+        optional_names = [str(p) for p in props.keys() if str(p) not in required_set]
+        parts: List[str] = []
+        if required_names:
+            parts.append("必填: " + ", ".join(required_names))
+        if optional_names:
+            shown_optional = optional_names[:max_optional]
+            optional_text = ", ".join(shown_optional)
+            if len(optional_names) > max_optional:
+                optional_text += ", ..."
+            parts.append("可选: " + optional_text)
+        return "；".join(parts)
+
+    @staticmethod
+    def _schema_type_matches(value: Any, schema: Dict[str, Any]) -> bool:
+        if not isinstance(schema, dict):
+            return True
+        enum_values = schema.get("enum")
+        if isinstance(enum_values, list) and enum_values and value not in enum_values:
+            return False
+        schema_type = schema.get("type")
+        if isinstance(schema_type, list):
+            return any(Dota2ReActAgent._schema_type_matches(value, {"type": t, "enum": enum_values}) for t in schema_type)
+        if not isinstance(schema_type, str):
+            return True
+        if schema_type == "string":
+            return isinstance(value, str)
+        if schema_type == "integer":
+            return isinstance(value, int) and not isinstance(value, bool)
+        if schema_type == "number":
+            return (isinstance(value, int) or isinstance(value, float)) and not isinstance(value, bool)
+        if schema_type == "boolean":
+            return isinstance(value, bool)
+        if schema_type == "array":
+            return isinstance(value, list)
+        if schema_type == "object":
+            return isinstance(value, dict)
+        return True
+
+    def _tool_repair_observation(
+        self,
+        tool_name: str,
+        arguments: Any,
+        issues: List[str],
+        include_schema: bool = True,
+    ) -> str:
+        lines = [f"工具调用校验失败：{tool_name or '<empty>'}"]
+        for issue in issues:
+            lines.append(f"- {issue}")
+
+        tool = self._find_tool_spec(tool_name)
+        if tool:
+            lines.append(f"- 正确签名: {self._tool_signature(tool, max_params=10)}")
+            param_hint = self._tool_param_hint(tool, max_optional=6)
+            if param_hint:
+                lines.append(f"- 参数提示: {param_hint}")
+            if include_schema:
+                lines.append("")
+                lines.append(self._build_tool_skill_content(tool_name))
+        else:
+            valid_names = sorted(
+                [
+                    str(item.get("name") or "").strip()
+                    for item in self.mcp_tools
+                    if str(item.get("name") or "").strip()
+                ]
+            )
+            suggestions = difflib.get_close_matches(str(tool_name or "").strip(), valid_names, n=5, cutoff=0.45)
+            if suggestions:
+                lines.append("- 最接近的已注册工具: " + ", ".join(suggestions))
+            lines.append('- 不确定时先调用 load_skill，示例 {"name":"tool:<工具名>"}')
+
+        raw_args = "{}"
+        if isinstance(arguments, dict):
+            try:
+                raw_args = json.dumps(arguments, ensure_ascii=False)
+            except Exception:
+                raw_args = str(arguments)
+        elif arguments is not None:
+            raw_args = str(arguments)
+        lines.append(f"- 本次 Action Input: {raw_args}")
+        lines.append("请改用上面给出的精确工具名和参数名继续，不要重复同一错误。")
+        return "\n".join(lines)
+
+    def _preflight_tool_call(self, tool_name: str, arguments: Any) -> Optional[str]:
+        key = str(tool_name or "").strip()
+        if not key:
+            return self._tool_repair_observation(tool_name, arguments, ["缺少工具名。"])
+
+        tool = self._find_tool_spec(key)
+        if not tool:
+            return self._tool_repair_observation(key, arguments, [f"未知工具 `{key}`。"])
+
+        if arguments is None:
+            arguments = {}
+        if not isinstance(arguments, dict):
+            return self._tool_repair_observation(
+                key,
+                arguments,
+                ["Action Input 必须是 JSON 对象。"],
+            )
+
+        _, props, required_set = self._tool_schema_parts(tool)
+        issues: List[str] = []
+
+        missing = [name for name in required_set if name not in arguments]
+        if missing:
+            issues.append("缺少必填字段: " + ", ".join(sorted(missing)))
+
+        unknown = [name for name in arguments.keys() if name not in props]
+        if unknown:
+            issues.append("存在未注册字段: " + ", ".join(sorted(unknown)))
+
+        type_errors: List[str] = []
+        for arg_name, arg_value in arguments.items():
+            spec = props.get(arg_name)
+            if isinstance(spec, dict) and not self._schema_type_matches(arg_value, spec):
+                expected = self._schema_type_text(spec)
+                actual = type(arg_value).__name__
+                type_errors.append(f"{arg_name} 期望类型 {expected}，实际为 {actual}")
+        if type_errors:
+            issues.extend(type_errors)
+
+        if issues:
+            return self._tool_repair_observation(key, arguments, issues)
+        return None
+
+    def _tool_runtime_error_observation(self, tool_name: str, arguments: Any, error_text: str) -> str:
+        return self._tool_repair_observation(
+            tool_name,
+            arguments,
+            [f"运行时错误: {str(error_text or '').strip() or '未知错误'}"],
+            include_schema=False,
+        )
 
     def _build_tool_skill_content(self, tool_name: str) -> str:
         tool = self._find_tool_spec(tool_name)
@@ -536,7 +723,7 @@ class Dota2ReActAgent:
                 lines.append(f"本轮高相关工具: {preview}")
 
         lines.append('工具详解按需加载：Action: load_skill / Action Input: {"name": "tool:<工具名>"}')
-        lines.append('领域流程按需加载：如 {"name":"ward_analysis"} / {"name":"team_recent_analysis"}')
+        lines.append('领域流程按需加载：如 {"name":"team_recent_analysis"} / {"name":"team_hero_analysis"}')
         text = "\n".join(lines)
         if self.force_full_skill_overview and budget <= 0:
             return text
@@ -619,6 +806,79 @@ class Dota2ReActAgent:
         })
         if len(self._recent_turns) > 20:
             self._recent_turns = self._recent_turns[-20:]
+
+    def _reset_turn_skill_state(self) -> None:
+        self._loaded_skills_current_turn = []
+        self._tool_history_current_turn = []
+
+    def _record_turn_tool_result(self, tool_name: str, tool_input: Dict[str, Any], observation: str) -> None:
+        name = str(tool_name or "").strip()
+        if not name:
+            return
+        self._tool_history_current_turn.append(name)
+        if name == "load_skill":
+            skill_name = str((tool_input or {}).get("name") or "").strip()
+            if skill_name and not str(observation or "").startswith("Error:") and skill_name not in self._loaded_skills_current_turn:
+                self._loaded_skills_current_turn.append(skill_name)
+
+    @staticmethod
+    def _contains_any(text: str, keywords: Tuple[str, ...]) -> bool:
+        hay = str(text or "")
+        return any(keyword in hay for keyword in keywords)
+
+    def _skill_completion_followup(self, user_input: str, final_answer: str) -> Optional[str]:
+        if not self._loaded_skills_current_turn:
+            return None
+
+        query = str(user_input or "").strip()
+        answer = str(final_answer or "").strip()
+        used_tools = set(self._tool_history_current_turn)
+
+        if "team_hero_analysis" in self._loaded_skills_current_turn:
+            missing_tools: List[str] = []
+            missing_sections: List[str] = []
+
+            if "get_team_heroes" not in used_tools:
+                missing_tools.append("先补充 `get_team_heroes(team_id, limit>=20)`，完成“历史常用英雄”层。")
+
+            if self._contains_any(query, ("最近", "近期", "选手", "玩什么英雄")):
+                if "get_team_players" not in used_tools:
+                    missing_tools.append("先补充 `get_team_players(team_id)`，确认当前成员。")
+                if "选手" in query or "们" in query:
+                    if "get_player_matches" not in used_tools:
+                        missing_tools.append("先逐个调用 `get_player_matches(account_id, limit>=5)`，完成选手近期英雄统计。")
+                elif "get_team_matches" not in used_tools and "get_player_matches" not in used_tools:
+                    missing_tools.append("先补充 `get_team_matches(team_id, limit>=10)` 或 `get_player_matches(...)`，完成近期英雄统计。")
+
+            if self._contains_any(query, ("出装", "装备", "路线")) and "get_match_items" not in used_tools:
+                missing_tools.append("先补充 `get_match_items(match_id)`，完成近期英雄出装路线层。")
+
+            if "get_team_heroes" in used_tools and not self._contains_any(answer, ("历史常用英雄", "历史英雄池")):
+                missing_sections.append("在最终答案中增加“历史常用英雄”小节。")
+
+            if self._contains_any(query, ("最近", "近期", "选手", "玩什么英雄")) and (
+                ("get_player_matches" in used_tools or "get_team_matches" in used_tools)
+                and not self._contains_any(answer, ("当前选手近期英雄", "近期英雄统计", "最近比赛英雄统计"))
+            ):
+                missing_sections.append("在最终答案中增加“当前选手近期英雄”或“最近比赛英雄统计”小节。")
+
+            if self._contains_any(query, ("出装", "装备", "路线")) and "get_match_items" in used_tools and not self._contains_any(answer, ("出装路线", "核心成型件", "开局常见件")):
+                missing_sections.append("在最终答案中增加“最近比赛出装路线”小节。")
+
+            if missing_tools or missing_sections:
+                lines = [
+                    "你已加载 `team_hero_analysis`，但当前还没有严格完成该 skill 要求，暂时不能直接给出 Final Answer。",
+                ]
+                if missing_tools:
+                    lines.append("请先补齐以下工具步骤：")
+                    lines.extend([f"- {item}" for item in missing_tools])
+                if missing_sections:
+                    lines.append("补齐数据后，最终答案还需包含以下内容：")
+                    lines.extend([f"- {item}" for item in missing_sections])
+                lines.append("请继续使用 Thought/Action/Action Input 获取缺失数据，补齐后再输出完整 Final Answer。")
+                return "\n".join(lines)
+
+        return None
 
     def load_recent_context_from_session(self, conversations: List[Dict[str, Any]]) -> None:
         """从历史会话加载最近2-3轮上下文。"""
@@ -990,8 +1250,63 @@ class Dota2ReActAgent:
             if after_input.strip():
                 print("⚠️ 检测到 Action Input 后继续输出，已截断")
                 return response[:input_match.end()]
-        
-        return response
+
+        return self._normalize_final_answer_response(response)
+
+    @staticmethod
+    def _is_generic_final_answer_suffix(suffix: str) -> bool:
+        text = str(suffix or "").strip()
+        if not text:
+            return True
+        if len(text) <= 40:
+            return True
+        return any(token in text for token in ("如上", "以上", "详见上文", "详见上述", "已整理"))
+
+    @staticmethod
+    def _split_leading_thought_block(text: str) -> Tuple[str, str]:
+        raw = str(text or "").strip()
+        if not raw:
+            return "", ""
+        match = re.match(r'^\s*Thought:\s*(.*?)(?=\n(?:Action:|Final Answer:)|\Z)', raw, re.DOTALL)
+        if not match:
+            return "", raw
+        thought = match.group(1).strip()
+        rest = raw[match.end():].lstrip()
+        thought_block = f"Thought: {thought}" if thought else "Thought:"
+        return thought_block, rest
+
+    def _normalize_final_answer_response(self, response: str) -> str:
+        text = str(response or "").strip()
+        if not text or "Final Answer:" not in text:
+            return text
+
+        thought_block, rest = self._split_leading_thought_block(text)
+        if not rest:
+            return text
+        if re.match(r'^\s*Final Answer:\s*', rest, re.DOTALL):
+            return text
+        if re.search(r'^\s*Action:\s*', rest, re.DOTALL):
+            return text
+
+        inline_match = re.search(r'\n\s*Final Answer:\s*(.*)$', rest, re.DOTALL)
+        if not inline_match:
+            return text
+
+        prefix_body = rest[:inline_match.start()].strip()
+        suffix = inline_match.group(1).strip()
+        if not prefix_body:
+            normalized_answer = suffix
+        elif self._is_generic_final_answer_suffix(suffix):
+            normalized_answer = prefix_body
+        else:
+            normalized_answer = f"{prefix_body}\n\n{suffix}"
+
+        normalized_answer = normalized_answer.strip()
+        if not normalized_answer:
+            return text
+        if thought_block:
+            return f"{thought_block}\nFinal Answer: {normalized_answer}"
+        return f"Final Answer: {normalized_answer}"
 
     def _sanitize_final_answer(self, answer: str) -> str:
         if not answer:
@@ -1034,10 +1349,31 @@ class Dota2ReActAgent:
     
     def _parse_final_answer(self, response: str) -> Optional[str]:
         """解析最终答案"""
-        match = re.search(r'Final Answer:\s*(.*)', response, re.DOTALL)
-        if match:
-            answer = match.group(1).strip()
+        text = str(response or "").strip()
+        if not text:
+            return None
+
+        leading_match = re.match(r'^\s*Final Answer:\s*(.*)$', text, re.DOTALL)
+        if leading_match:
+            answer = leading_match.group(1).strip()
             return self._sanitize_final_answer(answer)
+
+        inline_match = re.search(r'\n\s*Final Answer:\s*(.*)$', text, re.DOTALL)
+        if inline_match:
+            prefix = text[:inline_match.start()].strip()
+            suffix = inline_match.group(1).strip()
+
+            # 有些模型会先输出完整总结，最后再补一句 "Final Answer: 详见上文"。
+            # 这时应保留前面的正文，而不是只截取尾部摘要句。
+            if prefix and not re.match(r'^\s*Thought\s*:', prefix, re.IGNORECASE):
+                prefix_clean = self._sanitize_final_answer(prefix)
+                generic_suffix = self._is_generic_final_answer_suffix(suffix)
+                if generic_suffix:
+                    return prefix_clean
+                combined = f"{prefix}\n\n{suffix}"
+                return self._sanitize_final_answer(combined)
+
+            return self._sanitize_final_answer(suffix)
         return None
 
     def _extract_answer_text(self, response: str) -> str:
@@ -1192,6 +1528,7 @@ class Dota2ReActAgent:
             await self._record_memory_message("user", user_input)
 
         self._reset_visual_reports()
+        self._reset_turn_skill_state()
 
         # 开始记录对话
         if self.logger:
@@ -1238,6 +1575,13 @@ class Dota2ReActAgent:
                 # 检查是否有最终答案
                 final_answer = self._parse_final_answer(response)
                 if final_answer:
+                    followup = self._skill_completion_followup(user_input, final_answer)
+                    if followup:
+                        if self.logger:
+                            self.logger.log_iteration(i + 1, response)
+                        messages.append({"role": "assistant", "content": response})
+                        messages.append({"role": "user", "content": followup})
+                        continue
                     final_answer = await self._expand_truncated_final_answer(
                         messages=messages,
                         llm_response=response,
@@ -1264,11 +1608,15 @@ class Dota2ReActAgent:
                     print(f"\n🔧 调用工具: {tool_name}")
                     print(f"   参数: {tool_input}")
                     
-                    # 调用 MCP 工具
-                    try:
-                        observation = await self.call_mcp_tool(tool_name, tool_input)
-                    except Exception as e:
-                        observation = f"工具调用错误: {str(e)}"
+                    preflight_error = self._preflight_tool_call(tool_name, tool_input)
+                    if preflight_error is not None:
+                        observation = preflight_error
+                    else:
+                        # 调用 MCP 工具
+                        try:
+                            observation = await self.call_mcp_tool(tool_name, tool_input)
+                        except Exception as e:
+                            observation = self._tool_runtime_error_observation(tool_name, tool_input, str(e))
 
                     if tool_name in (
                         "analyze_match_wards",
@@ -1280,6 +1628,7 @@ class Dota2ReActAgent:
                     
                     print(f"\n📋 Observation:\n{observation[:500]}...")
                     self._maybe_capture_visual_report(tool_name, observation)
+                    self._record_turn_tool_result(tool_name, tool_input, observation)
                     
                     # 记录迭代
                     if self.logger:
@@ -1343,6 +1692,7 @@ class Dota2ReActAgent:
             await self._record_memory_message("user", user_input)
 
         self._reset_visual_reports()
+        self._reset_turn_skill_state()
 
         if self.logger:
             self.logger.start_conversation(user_input, self.llm_model)
@@ -1408,6 +1758,14 @@ class Dota2ReActAgent:
 
                 final_answer = self._parse_final_answer(response)
                 if final_answer:
+                    followup = self._skill_completion_followup(user_input, final_answer)
+                    if followup:
+                        if self.logger:
+                            self.logger.log_iteration(i + 1, response)
+                        messages.append({"role": "assistant", "content": response})
+                        messages.append({"role": "user", "content": followup})
+                        yield {"type": "observation", "content": followup}
+                        continue
                     final_answer = await self._expand_truncated_final_answer(
                         messages=messages,
                         llm_response=response,
@@ -1437,10 +1795,14 @@ class Dota2ReActAgent:
                     print(f"\n🔧 调用工具: {tool_name}")
                     print(f"   参数: {tool_input}")
 
-                    try:
-                        observation = await self.call_mcp_tool(tool_name, tool_input)
-                    except Exception as e:
-                        observation = f"工具调用错误: {str(e)}"
+                    preflight_error = self._preflight_tool_call(tool_name, tool_input)
+                    if preflight_error is not None:
+                        observation = preflight_error
+                    else:
+                        try:
+                            observation = await self.call_mcp_tool(tool_name, tool_input)
+                        except Exception as e:
+                            observation = self._tool_runtime_error_observation(tool_name, tool_input, str(e))
 
                     if tool_name in (
                         "analyze_match_wards",
@@ -1452,6 +1814,7 @@ class Dota2ReActAgent:
 
                     print(f"\n📋 Observation:\n{observation[:500]}...")
                     self._maybe_capture_visual_report(tool_name, observation)
+                    self._record_turn_tool_result(tool_name, tool_input, observation)
 
                     yield {"type": "observation", "content": observation}
 

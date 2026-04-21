@@ -10,6 +10,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 
@@ -30,7 +32,7 @@ class OpenVikingMemoryManager:
         memory_commit_only_success: bool = True,
         memory_retrieve_every_n: int = 2,
         memory_retrieve_min_chars: int = 12,
-        memory_retrieve_timeout: float = 2.0,
+        memory_retrieve_timeout: float = 4.0,
         memory_commit_timeout: float = 1.2,
         memory_record_user_min_chars: int = 8,
         memory_record_assistant_min_chars: int = 80,
@@ -55,7 +57,6 @@ class OpenVikingMemoryManager:
         self.memory_commit_timeout = max(0.2, float(memory_commit_timeout))
         self.memory_record_user_min_chars = max(0, int(memory_record_user_min_chars))
         self.memory_record_assistant_min_chars = max(0, int(memory_record_assistant_min_chars))
-        # <=0 表示不截断 tool trace，尽量保留完整运行结果
         self.tool_trace_max_chars = int(tool_trace_max_chars)
 
         self.ov_client: Optional[Any] = None
@@ -65,6 +66,8 @@ class OpenVikingMemoryManager:
         self._memory_turn = 0
         self._memory_last_query = ""
         self._memory_last_context = ""
+        self._last_search_error = ""
+        self._last_search_mode = ""
         self._memory_commit_lock = asyncio.Lock()
         self._background_tasks: set = set()
 
@@ -122,9 +125,7 @@ class OpenVikingMemoryManager:
 
     async def record_message(self, role: str, content: str, session: Optional[Any] = None) -> bool:
         target_session = session or self.ov_session
-        if not target_session or not content:
-            return False
-        if not self.text_part_cls:
+        if not target_session or not content or not self.text_part_cls:
             return False
 
         def _add() -> None:
@@ -173,11 +174,11 @@ class OpenVikingMemoryManager:
 
         summary = abstract
         if include_overview and overview and overview != abstract:
-            summary = f"{summary}（详情：{overview}）" if summary else overview
+            summary = f"{summary} (details: {overview})" if summary else overview
         if category:
             summary = f"[{category}] {summary}" if summary else f"[{category}]"
         if include_reason and reason:
-            summary = f"{summary}（匹配原因：{reason}）"
+            summary = f"{summary} (match: {reason})" if summary else reason
 
         if line_max_chars > 0 and len(summary) > line_max_chars:
             summary = summary[: max(0, line_max_chars - 3)] + "..."
@@ -191,7 +192,7 @@ class OpenVikingMemoryManager:
         include_overview: bool,
         include_reason: bool,
         line_max_chars: int = 0,
-        header: str = "相关记忆（供参考，可能不完整）：",
+        header: str = "Relevant memories (for reference, may be incomplete):",
     ) -> str:
         lines: List[str] = []
         for mem in memories:
@@ -239,7 +240,6 @@ class OpenVikingMemoryManager:
             except Exception:
                 pass
 
-            # 先给完整的 OpenViking 摘要结果
             context = self._compose_context(
                 memories[: self.memory_top_k],
                 include_overview=True,
@@ -251,60 +251,57 @@ class OpenVikingMemoryManager:
                 return ""
 
             if max_chars > 0 and len(context) > max_chars and prefer_summary:
-                # 1) 去掉匹配原因
                 compact = self._compose_context(
                     memories[: self.memory_top_k],
                     include_overview=True,
                     include_reason=False,
-                    header="相关记忆摘要（OpenViking）：",
+                    header="Relevant memory summary (OpenViking):",
                 )
                 if compact and len(compact) <= max_chars:
                     context = compact
                 else:
-                    # 2) 仅保留 abstract/category
                     compact = self._compose_context(
                         memories[: self.memory_top_k],
                         include_overview=False,
                         include_reason=False,
-                        header="相关记忆摘要（OpenViking）：",
+                        header="Relevant memory summary (OpenViking):",
                     )
                     if compact and len(compact) <= max_chars:
                         context = compact
                     else:
-                        # 3) 缩减条数，保持摘要语义
                         used = False
                         for keep in range(min(self.memory_top_k, len(memories)), 0, -1):
                             compact = self._compose_context(
                                 memories[:keep],
                                 include_overview=False,
                                 include_reason=False,
-                                header=f"相关记忆摘要（OpenViking，{keep}条）：",
+                                header=f"Relevant memory summary (OpenViking, top {keep}):",
                             )
                             if compact and len(compact) <= max_chars:
                                 context = compact
                                 used = True
                                 break
                         if not used:
-                            # 4) 行内压缩，不做尾部硬截断
-                            per_line_max = max(24, (max_chars // max(1, min(self.memory_top_k, len(memories)))) - 10)
+                            per_line_max = max(
+                                24,
+                                (max_chars // max(1, min(self.memory_top_k, len(memories)))) - 10,
+                            )
                             compact = self._compose_context(
                                 memories[: min(self.memory_top_k, len(memories))],
                                 include_overview=False,
                                 include_reason=False,
                                 line_max_chars=per_line_max,
-                                header="相关记忆摘要（OpenViking，压缩）：",
+                                header="Relevant memory summary (OpenViking, compressed):",
                             )
                             if compact and len(compact) <= max_chars:
                                 context = compact
                             else:
-                                # 兜底：返回结构化最小摘要（不拼接尾部截断标记）
                                 context = (
-                                    f"相关记忆摘要（OpenViking）：检索到 {len(memories)} 条相关记忆，"
-                                    "当前上下文预算不足，建议后续使用 memory_search 定向展开。"
+                                    f"Relevant memory summary (OpenViking): found {len(memories)} matches, "
+                                    "but the current context budget is too small. Use memory_search for details."
                                 )
 
             if max_chars > 0 and len(context) > max_chars:
-                # 最终兜底，确保调用方不会超预算
                 context = context[:max_chars]
 
             self._memory_last_query = cache_key
@@ -327,7 +324,6 @@ class OpenVikingMemoryManager:
         tool_name = (tool_name or "").strip()
         if not tool_name:
             return
-        input_text = ""
         try:
             input_text = json.dumps(tool_input, ensure_ascii=False)
         except Exception:
@@ -336,7 +332,7 @@ class OpenVikingMemoryManager:
         if self.tool_trace_max_chars > 0 and len(obs) > self.tool_trace_max_chars:
             obs = obs[: self.tool_trace_max_chars] + "...[truncated]"
         content = (
-            f"[tool_trace]\n"
+            "[tool_trace]\n"
             f"tool={tool_name}\n"
             f"input={input_text}\n"
             f"observation={obs}"
@@ -405,6 +401,8 @@ class OpenVikingMemoryManager:
         self._memory_turn = 0
         self._memory_last_query = ""
         self._memory_last_context = ""
+        self._last_search_error = ""
+        self._last_search_mode = ""
 
         if self.enable_memory and self.ov_client and self.ov_session_id:
             self.ov_session = self.ov_client.session(session_id=self.ov_session_id)
@@ -437,15 +435,96 @@ class OpenVikingMemoryManager:
         self.ov_client = None
         self.ov_session = None
 
+    @staticmethod
+    def _query_keywords(query: str) -> List[str]:
+        keywords: List[str] = []
+        seen: set = set()
+        for token in re.findall(r"[\u4e00-\u9fff]{2,}|[A-Za-z0-9_\-]{3,}", str(query or "")):
+            norm = token.strip().lower()
+            if not norm:
+                continue
+            variants = [norm]
+            if re.fullmatch(r"[\u4e00-\u9fff]{3,}", norm):
+                variants.extend(norm[i : i + 2] for i in range(len(norm) - 1))
+            for item in variants:
+                if not item or item in seen:
+                    continue
+                seen.add(item)
+                keywords.append(item)
+        return keywords
+
+    def _local_memory_fallback_search(self, query: str, limit: int = 5) -> List[Dict[str, str]]:
+        root = Path(self.ov_data_path) / "viking" / "user" / "memories"
+        if not root.exists():
+            return []
+
+        query_lower = str(query or "").strip().lower()
+        keywords = self._query_keywords(query)
+        matches: List[Tuple[int, float, Dict[str, str]]] = []
+
+        for path in root.rglob("*.md"):
+            try:
+                text = path.read_text(encoding="utf-8", errors="ignore").strip()
+            except Exception:
+                continue
+            if not text:
+                continue
+
+            text_lower = text.lower()
+            score = 0
+            if query_lower and query_lower in text_lower:
+                score += 8
+            hits = 0
+            for keyword in keywords:
+                if keyword in text_lower:
+                    hits += 1
+            score += hits * 3
+            if score <= 0:
+                continue
+
+            first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
+            if not first_line:
+                continue
+            snippet = first_line if len(first_line) <= 220 else first_line[:217] + "..."
+            item = {
+                "category": path.parent.name,
+                "abstract": snippet,
+                "path": str(path),
+            }
+            try:
+                mtime = path.stat().st_mtime
+            except Exception:
+                mtime = 0.0
+            matches.append((score, mtime, item))
+
+        matches.sort(key=lambda x: (x[0], x[1]), reverse=True)
+        lim = max(1, min(int(limit or 5), 20))
+        return [item for _, _, item in matches[:lim]]
+
+    @staticmethod
+    def _format_local_memory_results(query: str, matches: List[Dict[str, str]], reason: str = "") -> str:
+        lines: List[str] = [f"# Memory search results (query={query}, source=local_fallback)"]
+        if reason:
+            lines.append(f"> {reason}")
+        for idx, item in enumerate(matches, start=1):
+            category = item.get("category") or "local"
+            abstract = item.get("abstract") or "N/A"
+            path = item.get("path") or ""
+            lines.append(f"{idx}. [{category}] {abstract}")
+            if path:
+                lines.append(f"   - source: {path}")
+        return "\n".join(lines)
+
     async def memory_search_tool(self, query: str, limit: int = 5) -> str:
         query = (query or "").strip()
         if not query:
-            return "Error: query 不能为空。"
+            return "Error: query cannot be empty."
         if not self.enable_memory:
-            return "记忆功能已关闭。"
+            return "Memory is disabled."
         ready = await self.ensure_ready(self.ov_session_id)
         if not ready:
-            return "记忆功能不可用（初始化失败或未配置）。"
+            return "Memory is unavailable (initialization failed or configuration missing)."
+
         lim = max(1, min(int(limit or 5), 20))
         try:
             result = await asyncio.wait_for(
@@ -458,13 +537,45 @@ class OpenVikingMemoryManager:
                 timeout=self.memory_retrieve_timeout,
             )
             memories = result.memories if result else []
+            self._last_search_mode = "openviking"
+            self._last_search_error = ""
+        except asyncio.TimeoutError:
+            self._last_search_mode = "local_fallback"
+            self._last_search_error = f"openviking search timed out after {self.memory_retrieve_timeout:.1f}s"
+            fallback = self._local_memory_fallback_search(query, limit=lim)
+            if fallback:
+                return self._format_local_memory_results(
+                    query=query,
+                    matches=fallback,
+                    reason=f"OpenViking search timed out after {self.memory_retrieve_timeout:.1f}s; used local fallback.",
+                )
+            return f"Memory search timed out after {self.memory_retrieve_timeout:.1f}s, and local fallback found nothing."
         except Exception as e:
-            return f"记忆检索失败: {e}"
+            err = str(e).strip() or e.__class__.__name__
+            self._last_search_mode = "local_fallback"
+            self._last_search_error = err
+            fallback = self._local_memory_fallback_search(query, limit=lim)
+            if fallback:
+                return self._format_local_memory_results(
+                    query=query,
+                    matches=fallback,
+                    reason=f"OpenViking search failed ({err}); used local fallback.",
+                )
+            return f"Memory search failed: {err}"
 
         if not memories:
-            return "未检索到相关记忆。"
+            fallback = self._local_memory_fallback_search(query, limit=lim)
+            if fallback:
+                self._last_search_mode = "local_fallback"
+                self._last_search_error = ""
+                return self._format_local_memory_results(
+                    query=query,
+                    matches=fallback,
+                    reason="OpenViking returned no hits; used local fallback.",
+                )
+            return "No relevant memories found."
 
-        lines = [f"# 记忆检索结果（query={query}, limit={lim}）"]
+        lines = [f"# Memory search results (query={query}, limit={lim})"]
         for idx, mem in enumerate(memories[:lim], start=1):
             abstract = getattr(mem, "abstract", "") or "N/A"
             category = getattr(mem, "category", "") or "N/A"
@@ -482,31 +593,43 @@ class OpenVikingMemoryManager:
 
     async def memory_commit_tool(self) -> str:
         if not self.enable_memory:
-            return "记忆功能已关闭。"
+            return "Memory is disabled."
         ready = await self.ensure_ready(self.ov_session_id)
         if not ready:
-            return "记忆功能不可用（初始化失败或未配置）。"
+            return "Memory is unavailable (initialization failed or configuration missing)."
         try:
             await asyncio.wait_for(
                 self.commit_session(),
                 timeout=self.memory_commit_timeout,
             )
             self._memory_pending_count = 0
-            return "✅ 记忆已提交。"
+            return "Memory committed."
         except Exception as e:
-            return f"❌ 记忆提交失败: {e}"
+            err = str(e).strip() or e.__class__.__name__
+            return f"Memory commit failed: {err}"
 
     def memory_status_tool(self) -> str:
+        local_memory_count = 0
+        try:
+            local_memory_count = sum(
+                1 for _ in (Path(self.ov_data_path) / "viking" / "user" / "memories").rglob("*.md")
+            )
+        except Exception:
+            local_memory_count = 0
         return json.dumps(
             {
                 "enable_memory": self.enable_memory,
                 "has_openviking": self.has_openviking,
                 "session_id": self.ov_session_id,
                 "ready": bool(self.ov_client and self.ov_session),
+                "last_search_mode": self._last_search_mode,
+                "last_search_error": self._last_search_error,
+                "local_memory_count": local_memory_count,
                 "pending_count": self._memory_pending_count,
                 "memory_top_k": self.memory_top_k,
                 "retrieve_every_n": self.memory_retrieve_every_n,
                 "retrieve_min_chars": self.memory_retrieve_min_chars,
+                "retrieve_timeout": self.memory_retrieve_timeout,
                 "commit_every_n": self.memory_commit_every_n,
                 "commit_min_chars": self.memory_commit_min_chars,
             },
